@@ -59,11 +59,15 @@
     });
   }
 
-  // Run on load
-  document.addEventListener('DOMContentLoaded', initCohesiveAnimation);
-  
-  // Also run directly if already loaded
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initCohesiveAnimation, 100);
+  // Initialize script safely on load
+  if (document.readyState === 'complete') {
+    initCohesiveAnimation();
+    // Force a ScrollTrigger refresh after a short delay to account for other scripts adding pin spacing
+    setTimeout(function() { ScrollTrigger.refresh(); }, 500);
+  } else {
+    window.addEventListener('load', function() {
+      initCohesiveAnimation();
+      setTimeout(function() { ScrollTrigger.refresh(); }, 500);
+    });
   }
 })();
