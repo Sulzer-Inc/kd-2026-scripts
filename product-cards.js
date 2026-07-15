@@ -93,9 +93,9 @@
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onRefresh: function(self) {
-          // Force a white background on the dynamically created pin-spacer wrapper
+          // Force a background on the dynamically created pin-spacer wrapper
           if (self.spacer) {
-            self.spacer.style.backgroundColor = '#fff';
+            self.spacer.style.backgroundColor = '#f9f9f9';
           }
         }
       }
