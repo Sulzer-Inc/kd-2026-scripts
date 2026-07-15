@@ -91,7 +91,13 @@
         pin: section.closest('.products') || section, // Pin outermost section to prevent layout bugs
         scrub: CONFIG.pinScrub,
         anticipatePin: 1,
-        invalidateOnRefresh: true
+        invalidateOnRefresh: true,
+        onRefresh: function(self) {
+          // Force a white background on the dynamically created pin-spacer wrapper
+          if (self.spacer) {
+            self.spacer.style.backgroundColor = '#fff';
+          }
+        }
       }
     });
 
