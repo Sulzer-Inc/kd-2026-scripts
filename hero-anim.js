@@ -28,10 +28,12 @@
 
     // 3. Create Timeline
     var tl = gsap.timeline({
+      repeat: -1, // Infinite loop
+      yoyo: true, // Smoothly reverse the animation (erase lines, fade out shapes)
+      repeatDelay: 1, // Pause for 1 second when fully drawn before reversing
       scrollTrigger: {
         trigger: svgWrap,
-        start: 'top 75%', // Start animating when the hero is 25% down the screen (or immediately if at top)
-        once: true        // Play only once
+        start: 'top 75%' // Start animating when the hero is 25% down the screen (or immediately if at top)
       }
     });
 
