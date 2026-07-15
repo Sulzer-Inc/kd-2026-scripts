@@ -1,6 +1,37 @@
 (function () {
   gsap.registerPlugin(ScrollTrigger);
 
+  function getPillPosition(progress, w, h) {
+    var r = h / 2;
+    var flatWidth = Math.max(0, w - 2 * r);
+    var arcLen = Math.PI * r;
+    var perimeter = 2 * flatWidth + 2 * arcLen;
+    
+    var p = ((progress % 1) + 1) % 1; 
+    var d = p * perimeter;
+    
+    var seg1 = flatWidth / 2;
+    if (d <= seg1) return { x: w / 2 + d, y: 0 };
+    d -= seg1;
+    
+    if (d <= arcLen) {
+      var angle = -Math.PI / 2 + (d / arcLen) * Math.PI;
+      return { x: (w - r) + r * Math.cos(angle), y: r + r * Math.sin(angle) };
+    }
+    d -= arcLen;
+    
+    if (d <= flatWidth) return { x: (w - r) - d, y: 2 * r };
+    d -= flatWidth;
+    
+    if (d <= arcLen) {
+      var angle = Math.PI / 2 + (d / arcLen) * Math.PI;
+      return { x: r + r * Math.cos(angle), y: r + r * Math.sin(angle) };
+    }
+    d -= arcLen;
+    
+    return { x: r + d, y: 0 };
+  }
+
   function initCohesiveAnimation() {
     var wrapper = document.querySelector('.cohesive-k12__content');
     if (!wrapper) return;
@@ -8,10 +39,10 @@
     var items = document.querySelectorAll('.cohesive-k12__item');
     if (items.length === 0) return;
 
-    var proxy = { angle: 0 };
+    var proxy = { progress: 0 };
     
     gsap.to(proxy, {
-      angle: 360,
+      progress: 1,
       ease: 'none',
       scrollTrigger: {
         trigger: '.cohesive-k-12', 
@@ -24,37 +55,17 @@
         var w = wrapper.offsetWidth;
         var h = wrapper.offsetHeight;
         
-        // Ellipse center
-        var cx = w / 2;
-        var cy = h / 2;
-        
-        // Ellipse radii
-        var a = w / 2;
-        var b = h / 2;
-        
-        // Convert proxy angle to radians
-        var rad = proxy.angle * (Math.PI / 180);
-        
         items.forEach(function(item) {
-           // 1. Calculate the initial angle of this specific item based on its Webflow CSS
-           if (!item.dataset.startAngle) {
-              var initialLeft = parseFloat(getComputedStyle(item).left) || 0;
-              var initialTop = parseFloat(getComputedStyle(item).top) || 0;
-              // Find the angle (theta) from the center
-              var theta = Math.atan2((initialTop - cy) / b, (initialLeft - cx) / a);
-              item.dataset.startAngle = theta;
-           }
+           var startP = 0;
+           if (item.classList.contains('cohesive-k12__item--right')) startP = 0.25;
+           else if (item.classList.contains('cohesive-k12__item--bottom')) startP = 0.5;
+           else if (item.classList.contains('cohesive-k12__item--left')) startP = 0.75;
            
-           var startTheta = parseFloat(item.dataset.startAngle);
-           var currentTheta = startTheta + rad;
+           var currentP = startP + proxy.progress;
+           var pos = getPillPosition(currentP, w, h);
            
-           // 2. Calculate new position along the perimeter of the ellipse
-           var newLeft = cx + a * Math.cos(currentTheta);
-           var newTop = cy + b * Math.sin(currentTheta);
-           
-           // 3. Apply position (keeping Webflow's translate(-50%, -50%) intact for centering)
-           item.style.left = newLeft + 'px';
-           item.style.top = newTop + 'px';
+           item.style.left = pos.x + 'px';
+           item.style.top = pos.y + 'px';
         });
       }
     });
