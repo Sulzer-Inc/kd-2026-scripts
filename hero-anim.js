@@ -1,0 +1,72 @@
+(function () {
+  gsap.registerPlugin(ScrollTrigger);
+
+  function initHeroSVG() {
+    var svgWrap = document.querySelector('.hero-2026--animated-bg');
+    if (!svgWrap) return;
+
+    var traces = svgWrap.querySelectorAll('.anim-trace');
+    var fades = svgWrap.querySelectorAll('.anim-fade');
+
+    // 1. Prepare Traces (Draw Line Effect)
+    // We must manually set stroke-dasharray and stroke-dashoffset to the path length
+    traces.forEach(function (path) {
+      var length = path.getTotalLength ? path.getTotalLength() : 1000;
+      // Some paths have both fill and stroke. We hide the fill initially if it has anim-fade
+      gsap.set(path, {
+        strokeDasharray: length + 10, // Add padding to avoid anti-aliasing gaps
+        strokeDashoffset: length + 10,
+        opacity: 1 // Ensure the stroke is visible
+      });
+    });
+
+    // 2. Prepare Fades (Solid shapes)
+    // Hide all fill elements initially
+    if (fades.length > 0) {
+      gsap.set(fades, { fillOpacity: 0 });
+    }
+
+    // 3. Create Timeline
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: svgWrap,
+        start: 'top 75%', // Start animating when the hero is 25% down the screen (or immediately if at top)
+        once: true        // Play only once
+      }
+    });
+
+    // Animate lines drawing in randomly/staggered
+    if (traces.length > 0) {
+      tl.to(traces, {
+        strokeDashoffset: 0,
+        duration: 2,
+        ease: 'power2.inOut',
+        stagger: {
+          amount: 1,
+          from: 'random'
+        }
+      }, 0);
+    }
+
+    // Animate fills fading in shortly after the tracing starts
+    if (fades.length > 0) {
+      tl.to(fades, {
+        fillOpacity: 1,
+        duration: 1.5,
+        ease: 'power2.out',
+        stagger: {
+          amount: 1,
+          from: 'random'
+        }
+      }, 1); // Start fading in at the 1 second mark of the timeline
+    }
+  }
+
+  // Run on load and if DOM changes
+  document.addEventListener('DOMContentLoaded', initHeroSVG);
+  
+  // Since Webflow sometimes loads scripts asynchronously, run it directly as well
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(initHeroSVG, 100);
+  }
+})();
