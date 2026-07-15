@@ -8,11 +8,9 @@
     pinDistanceMobile: '+=900',
     mobileBreakpoint: 1024,
     minWrapperHeight: 560,          // ensures a reasonable pill orbit area
-    scaleStart: 0.7,                // items begin at 70% of their actual size (uniform)
+    scaleStart: 0.6,                // items begin at 70% of their actual size (uniform)
     scaleEnd: 1.0,                  // items grow to 100% of their actual size
-    scaleFinishAt: 0.8,             // scaling completes at 80% of scroll (faster than fade)
-    entranceStagger: 0.05,          // per-item fade delay (so fade outlasts the scaling)
-    entranceDuration: 0.25          // per-item fade duration
+    scaleFinishAt: 0.8              // scaling completes at 80% of scroll
   };
 
   // power4.out easing approximation
@@ -73,28 +71,11 @@
     return 0; // --top / default
   }
 
-  // Compute the entrance progress [0..1] for an item at a given scroll progress.
-  // Items fade in and scale up staggered, so they cascade into the orbit.
-  function getEntranceProgress(item, itemIndex, scrollProgress) {
-    if (item.__cohesiveEntered) return 1; // sticky: stay visible after first entrance
-    var start = itemIndex * CONFIG.entranceStagger;
-    var end = Math.min(start + CONFIG.entranceDuration, CONFIG.totalProgress);
-    var t = (scrollProgress - start) / (end - start);
-    if (t <= 0) return 0;
-    if (t >= 1) {
-      item.__cohesiveEntered = true;
-      return 1;
-    }
-    return power4Out(t);
-  }
-
-  function applyItemTransform(item, pos, entranceT, itemScale) {
+  function applyItemTransform(item, pos, itemScale) {
     // Position from the pill path
     item.style.left = pos.x + 'px';
     item.style.top = pos.y + 'px';
-    // Fade opacity (per-item, staggered cascade)
-    item.style.opacity = entranceT;
-    // Identical scale for every item (not depth-based, not per-item staggered)
+    // Identical scale for every item (uniform, scroll-driven)
     item.style.transform = 'translate(-50%, -50%) scale(' + itemScale.toFixed(3) + ')';
   }
 
@@ -117,7 +98,6 @@
       if (prev.tl) prev.tl.kill();
       gsap.set(items, { clearProps: 'position,left,top,transform,opacity,width,maxWidth,zIndex,pointerEvents' });
       if (heading) gsap.set(heading, { clearProps: 'position,left,top,transform,zIndex' });
-      items.forEach(function (it) { delete it.__cohesiveEntered; });
     }
 
     // Measure wrapper WHILE items are still in flow, so we get the natural height
@@ -142,23 +122,23 @@
       });
     }
 
-    // Prepare each item: absolute, hidden, half-size, waiting to fade/scale in
+    // Prepare each item: absolute, fully visible, 70% size, ready to scale up and orbit
     var itemArr = Array.prototype.slice.call(items);
     itemArr.forEach(function (item, i) {
       gsap.set(item, {
         position: 'absolute',
         left: 0,
         top: 0,
-        opacity: 0,
+        opacity: 1,
         scale: CONFIG.scaleStart,
         pointerEvents: 'none',
         zIndex: 1,
-        willChange: 'transform, opacity'
+        willChange: 'transform'
       });
       // Place at the pill position for its starting slot immediately
       var startP = getItemStartProgress(item);
       var pos = getPillPosition(startP, w, h);
-      applyItemTransform(item, pos, 0, CONFIG.scaleStart);
+      applyItemTransform(item, pos, CONFIG.scaleStart);
     });
 
     var proxy = { progress: 0 };
@@ -198,8 +178,7 @@
           var startP = getItemStartProgress(item);
           var currentP = startP + proxy.progress;
           var pos = getPillPosition(currentP, cw, ch);
-          var entranceT = getEntranceProgress(item, i, proxy.progress);
-          applyItemTransform(item, pos, entranceT, itemScale);
+          applyItemTransform(item, pos, itemScale);
         }
       }
     });
