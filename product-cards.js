@@ -93,9 +93,14 @@
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onRefresh: function(self) {
-          // Force a background on the dynamically created pin-spacer wrapper
+          // Dynamically inherit the background color from the pinned element (so Webflow controls the styling)
           if (self.spacer) {
-            self.spacer.style.backgroundColor = '#f9f9f9';
+            var pinnedEl = section.closest('.products') || section;
+            var bgColor = window.getComputedStyle(pinnedEl).backgroundColor;
+            // Only apply if it's not transparent to prevent overriding with nothing
+            if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+              self.spacer.style.backgroundColor = bgColor;
+            }
           }
         }
       }
