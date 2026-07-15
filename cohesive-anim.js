@@ -42,7 +42,7 @@
     var proxy = { progress: 0 };
     
     gsap.to(proxy, {
-      progress: 1,
+      progress: 0.35, // Only rotate ~120 degrees total instead of a full 360 loop to match Lassie.ai's subtle speed
       ease: 'none',
       scrollTrigger: {
         trigger: '.cohesive-k-12', 
