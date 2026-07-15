@@ -8,11 +8,11 @@
     pinDistanceMobile: '+=900',
     mobileBreakpoint: 1024,
     minWrapperHeight: 560,          // ensures a reasonable pill orbit area
-    scaleMin: 0.7,                  // depth-based scale at top of orbit
-    scaleMax: 1.0,                  // depth-based scale at bottom of orbit
-    entranceStartScale: 0.5,        // items begin at half-size (like Lassie data-graphics)
-    entranceStagger: 0.04,          // per-item delay (as a fraction of proxy progress)
-    entranceDuration: 0.18          // per-item fade/scale duration (as a fraction of proxy progress)
+    scaleStart: 0.7,                // items begin at 70% of their actual size (uniform)
+    scaleEnd: 1.0,                  // items grow to 100% of their actual size
+    scaleFinishAt: 0.8,             // scaling completes at 80% of scroll (faster than fade)
+    entranceStagger: 0.05,          // per-item fade delay (so fade outlasts the scaling)
+    entranceDuration: 0.25          // per-item fade duration
   };
 
   // power4.out easing approximation
@@ -88,17 +88,14 @@
     return power4Out(t);
   }
 
-  function applyItemTransform(item, pos, h, entranceT) {
-    // Depth-based scale: items grow slightly as they travel to the bottom of the orbit
-    var depthScale = CONFIG.scaleMin + (CONFIG.scaleMax - CONFIG.scaleMin) * (pos.y / h);
-    // Entrance scale: 0.5 -> 1.0 as the item fades in
-    var entranceScale = CONFIG.entranceStartScale + (1 - CONFIG.entranceStartScale) * entranceT;
-    var finalScale = entranceScale * depthScale;
-
+  function applyItemTransform(item, pos, entranceT, itemScale) {
+    // Position from the pill path
     item.style.left = pos.x + 'px';
     item.style.top = pos.y + 'px';
+    // Fade opacity (per-item, staggered cascade)
     item.style.opacity = entranceT;
-    item.style.transform = 'translate(-50%, -50%) scale(' + finalScale.toFixed(3) + ')';
+    // Identical scale for every item (not depth-based, not per-item staggered)
+    item.style.transform = 'translate(-50%, -50%) scale(' + itemScale.toFixed(3) + ')';
   }
 
   function initCohesiveAnimation() {
@@ -153,7 +150,7 @@
         left: 0,
         top: 0,
         opacity: 0,
-        scale: CONFIG.entranceStartScale,
+        scale: CONFIG.scaleStart,
         pointerEvents: 'none',
         zIndex: 1,
         willChange: 'transform, opacity'
@@ -161,7 +158,7 @@
       // Place at the pill position for its starting slot immediately
       var startP = getItemStartProgress(item);
       var pos = getPillPosition(startP, w, h);
-      applyItemTransform(item, pos, h, 0);
+      applyItemTransform(item, pos, 0, CONFIG.scaleStart);
     });
 
     var proxy = { progress: 0 };
@@ -186,13 +183,23 @@
         var ch = wrapper.offsetHeight;
         if (cw === 0 || ch === 0) return;
 
+        // Uniform scale across all items — tied to overall scroll progress, not per-item.
+        // Starts at CONFIG.scaleStart, reaches CONFIG.scaleEnd at scaleFinishAt (80%) of scroll,
+        // then plateaus at CONFIG.scaleEnd for the rest of the scroll.
+        var scrollNorm = proxy.progress / CONFIG.totalProgress;
+        var scaleT = scrollNorm / CONFIG.scaleFinishAt;
+        if (scaleT < 0) scaleT = 0;
+        if (scaleT > 1) scaleT = 1;
+        var scaleEased = power4Out(scaleT);
+        var itemScale = CONFIG.scaleStart + (CONFIG.scaleEnd - CONFIG.scaleStart) * scaleEased;
+
         for (var i = 0; i < itemArr.length; i++) {
           var item = itemArr[i];
           var startP = getItemStartProgress(item);
           var currentP = startP + proxy.progress;
           var pos = getPillPosition(currentP, cw, ch);
           var entranceT = getEntranceProgress(item, i, proxy.progress);
-          applyItemTransform(item, pos, ch, entranceT);
+          applyItemTransform(item, pos, entranceT, itemScale);
         }
       }
     });
