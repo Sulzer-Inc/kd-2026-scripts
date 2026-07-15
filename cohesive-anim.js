@@ -14,10 +14,11 @@
       angle: 360,
       ease: 'none',
       scrollTrigger: {
-        trigger: '.cohesive-k-12', // Target the section wrapper to avoid recalculation bugs
-        start: 'top center',       // Start animation when section hits middle of screen
-        end: 'bottom center',      // End when it leaves
-        scrub: 1                   // Smooth scrubbing
+        trigger: '.cohesive-k-12', 
+        start: 'center center',    // Start animation when section is perfectly centered
+        end: '+=1500',             // Pin it for 1500px of scrolling so the rotation is slow and deliberate
+        scrub: 1,                  // Smooth scrubbing
+        pin: true                  // Pin the section like Lassie.ai does
       },
       onUpdate: function() {
         var w = wrapper.offsetWidth;
