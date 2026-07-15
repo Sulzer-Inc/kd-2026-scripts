@@ -21,9 +21,14 @@
     });
 
     // 2. Prepare Fades (Solid shapes)
-    // Hide all fill elements initially
+    // Hide all fill elements and apply initial scale/translation for a modern pop-in effect
     if (fades.length > 0) {
-      gsap.set(fades, { fillOpacity: 0 });
+      gsap.set(fades, { 
+        fillOpacity: 0,
+        scale: 0.5,
+        y: 30,
+        transformOrigin: '50% 50%' 
+      });
     }
 
     // 3. Create Timeline
@@ -50,14 +55,16 @@
       }, 0);
     }
 
-    // Animate fills fading in shortly after the tracing starts
+    // Animate fills popping in with a modern elastic/float effect
     if (fades.length > 0) {
       tl.to(fades, {
         fillOpacity: 1,
-        duration: 1.5,
-        ease: 'power2.out',
+        scale: 1,
+        y: 0,
+        duration: 2.5,
+        ease: 'elastic.out(1, 0.6)', // Modern bouncy feel
         stagger: {
-          amount: 1,
+          amount: 1.2,
           from: 'random'
         }
       }, 1); // Start fading in at the 1 second mark of the timeline
