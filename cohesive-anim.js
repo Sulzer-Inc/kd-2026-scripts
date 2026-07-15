@@ -64,8 +64,12 @@
            var currentP = startP + proxy.progress;
            var pos = getPillPosition(currentP, w, h);
            
+           // Calculate 3D scale based on vertical position (0.6 at top, 1.0 at bottom)
+           var scale = 0.6 + 0.4 * (pos.y / h);
+           
            item.style.left = pos.x + 'px';
            item.style.top = pos.y + 'px';
+           item.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
         });
       }
     });
