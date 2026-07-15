@@ -58,7 +58,7 @@
       if (txt) gsap.set(txt, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30 });
     });
 
-    // Calculate maximum available space to prevent text overflow
+    // Calculate maximum available space to prevent text overflow.
     var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 40;
     var textMaxWidth = Math.max(120, Math.min(257, availableTextSpace));
     var leftX = -(textMaxWidth + 32);
