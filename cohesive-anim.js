@@ -280,7 +280,7 @@
 
     state.items.forEach(function (item) {
       gsap.set(item, { clearProps: 'all' });
-      var cover = item.querySelector('img');
+      var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
       if (cover) gsap.set(cover, { clearProps: 'all' });
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
       if (iframe) gsap.set(iframe, { clearProps: 'all' });
@@ -288,7 +288,7 @@
 
     if (window.innerWidth < CONFIG.mobileBreakpoint) {
       state.items.forEach(function (item) {
-        var cover = item.querySelector('img');
+        var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
         if (cover) cover.style.opacity = '1';
         var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
         if (iframe) iframe.style.opacity = '0';
@@ -347,7 +347,7 @@
       item.style.transform = 'translate(-50%, -50%)';
 
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
-      var cover = item.querySelector('img');
+      var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
       if (iframe) iframe.style.opacity = isCurrentActive ? '1' : '0';
       if (cover) cover.style.opacity = isCurrentActive ? '0' : '1';
     });
@@ -399,7 +399,7 @@
 
             // Fade cover and iframe
             var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
-            var cover = item.querySelector('img');
+            var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
             if (iframe) iframe.style.opacity = t.toFixed(3);
             if (cover) cover.style.opacity = (1 - t).toFixed(3);
 
