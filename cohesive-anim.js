@@ -243,3 +243,254 @@
     window.Webflow.push(function () { setTimeout(startWhenReady, 200); });
   }
 })();
+
+// Circular Video Orbit Animation
+(function () {
+  gsap.registerPlugin(ScrollTrigger);
+
+  var CONFIG = {
+    mobileBreakpoint: 991,
+    pinDistance: '+=1200',
+    totalRotation: 240 * Math.PI / 180, // 240 degrees in radians
+    vimeoUrl: 'https://player.vimeo.com/video/1202563231?api=1&background=1&autoplay=0&loop=1&muted=1'
+  };
+
+  var state = {
+    tl: null,
+    items: [],
+    activeIdx: 0,
+    playersReady: {}
+  };
+
+  function initRotatorAnimation() {
+    var section = document.querySelector('.inside-every-lesson');
+    if (!section) return;
+
+    var container = section.querySelector('.rotator-video');
+    if (!container) return;
+
+    // Clean up any existing instance
+    if (state.tl) {
+      if (state.tl.scrollTrigger) state.tl.scrollTrigger.kill(true);
+      state.tl.kill();
+      state.tl = null;
+    }
+
+    // Reset items
+    if (state.items.length > 0) {
+      state.items.forEach(function (item) {
+        gsap.set(item, { clearProps: 'all' });
+        var cover = item.querySelector('.rotator-video__cover');
+        if (cover) gsap.set(cover, { clearProps: 'all' });
+        var video = item.querySelector('.rotator-video__video');
+        if (video) gsap.set(video, { clearProps: 'all' });
+      });
+    }
+
+    // Check breakpoint
+    if (window.innerWidth < CONFIG.mobileBreakpoint) {
+      var covers = container.querySelectorAll('.rotator-video__cover');
+      covers.forEach(function (cover) { cover.style.opacity = '1'; });
+      var videos = container.querySelectorAll('.rotator-video__video');
+      videos.forEach(function (video) { video.style.opacity = '0'; });
+      return;
+    }
+
+    // Check if we already did the iframe wrapping
+    var originalImages = container.querySelectorAll('img.rotator-video__item');
+    if (originalImages.length > 0) {
+      state.items = [];
+      Array.prototype.slice.call(originalImages).forEach(function (img) {
+        var wrapper = document.createElement('div');
+        wrapper.className = img.className;
+        wrapper.style.position = 'absolute';
+        wrapper.style.width = '90%';
+        wrapper.style.aspectRatio = '16/9';
+
+        // Determine starting angle based on class name
+        var startAngle = 0;
+        if (img.classList.contains('vid-2')) {
+          startAngle = 0; // Right (active)
+        } else if (img.classList.contains('vid-3')) {
+          startAngle = 120 * Math.PI / 180; // Bottom-left
+        } else if (img.classList.contains('vid-1')) {
+          startAngle = -120 * Math.PI / 180; // Top-left
+        }
+        wrapper.startAngle = startAngle;
+
+        // Cover Image
+        var cover = document.createElement('img');
+        cover.src = img.src;
+        cover.className = 'rotator-video__cover';
+        cover.style.position = 'absolute';
+        cover.style.top = '0';
+        cover.style.left = '0';
+        cover.style.width = '100%';
+        cover.style.height = '100%';
+        cover.style.objectFit = 'cover';
+        cover.style.transition = 'opacity 0.3s';
+        cover.style.pointerEvents = 'none';
+        cover.style.borderRadius = '8px';
+        cover.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+
+        // Video Iframe
+        var iframe = document.createElement('iframe');
+        iframe.src = CONFIG.vimeoUrl;
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'autoplay; fullscreen');
+        iframe.className = 'rotator-video__video';
+        iframe.style.position = 'absolute';
+        iframe.style.top = '0';
+        iframe.style.left = '0';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.opacity = '0';
+        iframe.style.transition = 'opacity 0.3s';
+        iframe.style.pointerEvents = 'none';
+        iframe.style.borderRadius = '8px';
+
+        wrapper.appendChild(cover);
+        wrapper.appendChild(iframe);
+        img.parentNode.replaceChild(wrapper, img);
+        state.items.push(wrapper);
+      });
+    } else {
+      // Wrappers are already created, grab them
+      state.items = Array.prototype.slice.call(container.querySelectorAll('.rotator-video__item'));
+    }
+
+    // Position them immediately at starting progress
+    state.items.forEach(function (item) {
+      var theta = item.startAngle;
+      item.style.left = (50 + 50 * Math.cos(theta)) + '%';
+      item.style.top = (50 + 50 * Math.sin(theta)) + '%';
+      var isActive = item.startAngle === 0;
+      var scale = isActive ? 1.0 : 0.5;
+      item.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+      
+      var iframe = item.querySelector('.rotator-video__video');
+      var cover = item.querySelector('.rotator-video__cover');
+      if (iframe) iframe.style.opacity = isActive ? '1' : '0';
+      if (cover) cover.style.opacity = isActive ? '0' : '1';
+    });
+
+    var proxy = { progress: 0 };
+    state.activeIdx = 0;
+
+    // Create timeline
+    state.tl = gsap.to(proxy, {
+      progress: 1.0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: 'center center',
+        end: CONFIG.pinDistance,
+        pin: true,
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+        onUpdate: function (self) {
+          var phi = self.progress * CONFIG.totalRotation;
+          var closestIdx = -1;
+          var minCoverDist = Infinity;
+
+          state.items.forEach(function (item, idx) {
+            var theta = item.startAngle + phi;
+
+            // Position
+            item.style.left = (50 + 50 * Math.cos(theta)) + '%';
+            item.style.top = (50 + 50 * Math.sin(theta)) + '%';
+
+            // Calculate distance to active angle (0)
+            var normalizedTheta = theta % (2 * Math.PI);
+            if (normalizedTheta > Math.PI) normalizedTheta -= 2 * Math.PI;
+            if (normalizedTheta < -Math.PI) normalizedTheta += 2 * Math.PI;
+
+            var dist = Math.abs(normalizedTheta);
+            var limit = 90 * Math.PI / 180; // 90 degrees
+            var t = Math.max(0, 1 - dist / limit);
+
+            var scale = 0.5 + 0.5 * t;
+            item.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(3) + ')';
+
+            // Cross-fade cover and video iframe
+            var iframe = item.querySelector('.rotator-video__video');
+            var cover = item.querySelector('.rotator-video__cover');
+            if (iframe) iframe.style.opacity = t.toFixed(3);
+            if (cover) cover.style.opacity = (1 - t).toFixed(3);
+
+            // Track closest to active angle
+            if (dist < minCoverDist) {
+              minCoverDist = dist;
+              closestIdx = idx;
+            }
+          });
+
+          // Play/pause control based on active change
+          if (closestIdx !== -1 && closestIdx !== state.activeIdx) {
+            state.activeIdx = closestIdx;
+            controlVideos();
+          }
+        }
+      }
+    });
+  }
+
+  function controlVideos() {
+    state.items.forEach(function (item, idx) {
+      var iframe = item.querySelector('.rotator-video__video');
+      if (!iframe || !iframe.contentWindow) return;
+
+      var isCurrentActive = (idx === state.activeIdx);
+      if (state.playersReady[idx]) {
+        var action = isCurrentActive ? 'play' : 'pause';
+        iframe.contentWindow.postMessage(JSON.stringify({ method: action }), '*');
+      }
+    });
+  }
+
+  // Set up message listener for Vimeo players ready event
+  window.addEventListener('message', function (event) {
+    if (event.origin && event.origin.indexOf('vimeo.com') !== -1) {
+      try {
+        var data = JSON.parse(event.data);
+        if (data.event === 'ready') {
+          state.items.forEach(function (item, idx) {
+            var iframe = item.querySelector('.rotator-video__video');
+            if (iframe && iframe.contentWindow === event.source) {
+              state.playersReady[idx] = true;
+              if (idx === state.activeIdx) {
+                iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
+              } else {
+                iframe.contentWindow.postMessage(JSON.stringify({ method: 'pause' }), '*');
+              }
+            }
+          });
+        }
+      } catch (e) {}
+    }
+  });
+
+  function startWhenReady() {
+    var section = document.querySelector('.inside-every-lesson');
+    if (!section) return;
+
+    initRotatorAnimation();
+    ScrollTrigger.refresh();
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(startWhenReady, 100);
+  } else {
+    document.addEventListener('DOMContentLoaded', startWhenReady);
+  }
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(startWhenReady, 250);
+  });
+
+  if (window.Webflow) {
+    window.Webflow.push(function () { setTimeout(startWhenReady, 200); });
+  }
+})();
