@@ -455,8 +455,7 @@
   var CONFIG = {
     mobileBreakpoint: 991,
     pinDistance: '+=1200',
-    totalRotation: 240 * Math.PI / 180,
-    vimeoUrl: 'https://player.vimeo.com/video/1202563231?api=1&background=1&autoplay=0&loop=1&muted=1'
+    spacingMode: 'quarter' // 'quarter' (90 degrees) or 'dynamic' (360 / items.length)
   };
 
   var state = {
@@ -479,94 +478,82 @@
       state.tl = null;
     }
 
-    if (state.items.length > 0) {
-      state.items.forEach(function (item) {
-        gsap.set(item, { clearProps: 'all' });
-        var cover = item.querySelector('.rotator-video__cover');
-        if (cover) gsap.set(cover, { clearProps: 'all' });
-        var video = item.querySelector('.rotator-video__video');
-        if (video) gsap.set(video, { clearProps: 'all' });
-      });
-    }
+    // Reset items inline styles on resizing or re-init
+    state.items = Array.prototype.slice.call(container.querySelectorAll('.rotator-video__item'));
+    if (state.items.length === 0) return;
+
+    state.items.forEach(function (item) {
+      gsap.set(item, { clearProps: 'all' });
+      var cover = item.querySelector('img');
+      if (cover) gsap.set(cover, { clearProps: 'all' });
+      var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
+      if (iframe) gsap.set(iframe, { clearProps: 'all' });
+    });
 
     if (window.innerWidth < CONFIG.mobileBreakpoint) {
-      var covers = container.querySelectorAll('.rotator-video__cover');
-      covers.forEach(function (cover) { cover.style.opacity = '1'; });
-      var videos = container.querySelectorAll('.rotator-video__video');
-      videos.forEach(function (video) { video.style.opacity = '0'; });
+      state.items.forEach(function (item) {
+        var cover = item.querySelector('img');
+        if (cover) cover.style.opacity = '1';
+        var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
+        if (iframe) iframe.style.opacity = '0';
+      });
       return;
     }
 
-    var originalImages = container.querySelectorAll('img.rotator-video__item');
-    if (originalImages.length > 0) {
-      state.items = [];
-      Array.prototype.slice.call(originalImages).forEach(function (img) {
-        var wrapper = document.createElement('div');
-        wrapper.className = img.className;
-        wrapper.style.position = 'absolute';
-        wrapper.style.width = '90%';
-        wrapper.style.aspectRatio = '16/9';
+    var N = state.items.length;
+    var spacing = (CONFIG.spacingMode === 'quarter') ? (Math.PI / 2) : (2 * Math.PI / N);
 
-        var startAngle = 0;
-        if (img.classList.contains('vid-2')) {
-          startAngle = 0;
-        } else if (img.classList.contains('vid-3')) {
-          startAngle = 120 * Math.PI / 180;
-        } else if (img.classList.contains('vid-1')) {
-          startAngle = -120 * Math.PI / 180;
-        }
-        wrapper.startAngle = startAngle;
+    // Calculate starting angles based on Webflow classes
+    state.items.forEach(function (item, idx) {
+      item.style.position = 'absolute';
+      item.style.maxWidth = 'none'; // clear CSS max-width limits to allow dynamic sizing
 
-        var cover = document.createElement('img');
-        cover.src = img.src;
-        cover.className = 'rotator-video__cover';
-        cover.style.position = 'absolute';
-        cover.style.top = '0';
-        cover.style.left = '0';
-        cover.style.width = '100%';
-        cover.style.height = '100%';
-        cover.style.objectFit = 'cover';
-        cover.style.transition = 'opacity 0.3s';
-        cover.style.pointerEvents = 'none';
-        cover.style.borderRadius = '8px';
-        cover.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+      var startAngle = 0;
+      if (item.classList.contains('vid-2')) {
+        startAngle = 0; // right (active)
+      } else if (item.classList.contains('vid-3')) {
+        startAngle = spacing; // bottom
+      } else if (item.classList.contains('vid-1')) {
+        startAngle = -spacing; // top
+      } else {
+        startAngle = idx * spacing;
+      }
+      item.startAngle = startAngle;
 
-        var iframe = document.createElement('iframe');
-        iframe.src = CONFIG.vimeoUrl;
-        iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allow', 'autoplay; fullscreen');
-        iframe.className = 'rotator-video__video';
-        iframe.style.position = 'absolute';
-        iframe.style.top = '0';
-        iframe.style.left = '0';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.opacity = '0';
-        iframe.style.transition = 'opacity 0.3s';
-        iframe.style.pointerEvents = 'none';
-        iframe.style.borderRadius = '8px';
+      // Auto-append api=1 to Vimeo iframes to enable postMessage API controls
+      var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
+      if (iframe && iframe.src && iframe.src.indexOf('vimeo.com') !== -1 && iframe.src.indexOf('api=1') === -1) {
+        var separator = iframe.src.indexOf('?') === -1 ? '?' : '&';
+        iframe.src = iframe.src + separator + 'api=1';
+      }
+    });
 
-        wrapper.appendChild(cover);
-        wrapper.appendChild(iframe);
-        img.parentNode.replaceChild(wrapper, img);
-        state.items.push(wrapper);
-      });
+    var startRotation, endRotation;
+    if (CONFIG.spacingMode === 'quarter') {
+      startRotation = -spacing;
+      endRotation = spacing;
     } else {
-      state.items = Array.prototype.slice.call(container.querySelectorAll('.rotator-video__item'));
+      startRotation = 0;
+      endRotation = (N - 1) * spacing;
     }
+    var rotationSpan = endRotation - startRotation;
 
+    // Set starting positions
     state.items.forEach(function (item) {
-      var theta = item.startAngle;
+      var theta = item.startAngle + startRotation;
       item.style.left = (50 + 50 * Math.cos(theta)) + '%';
       item.style.top = (50 + 50 * Math.sin(theta)) + '%';
-      var isActive = item.startAngle === 0;
-      var scale = isActive ? 1.0 : 0.5;
-      item.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
       
-      var iframe = item.querySelector('.rotator-video__video');
-      var cover = item.querySelector('.rotator-video__cover');
-      if (iframe) iframe.style.opacity = isActive ? '1' : '0';
-      if (cover) cover.style.opacity = isActive ? '0' : '1';
+      var isCurrentActive = Math.abs(theta % (2 * Math.PI)) < 0.01;
+      var width = isCurrentActive ? 90 : 50;
+      item.style.width = width + '%';
+      item.style.aspectRatio = '16/9';
+      item.style.transform = 'translate(-50%, -50%)';
+
+      var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
+      var cover = item.querySelector('img');
+      if (iframe) iframe.style.opacity = isCurrentActive ? '1' : '0';
+      if (cover) cover.style.opacity = isCurrentActive ? '0' : '1';
     });
 
     var proxy = { progress: 0 };
@@ -581,31 +568,42 @@
         end: CONFIG.pinDistance,
         pin: true,
         scrub: 0.5,
+        snap: {
+          snapTo: 1 / (N - 1),
+          duration: { min: 0.2, max: 0.5 },
+          ease: 'power1.inOut'
+        },
         invalidateOnRefresh: true,
         onUpdate: function (self) {
-          var phi = self.progress * CONFIG.totalRotation;
+          var phi = startRotation + self.progress * rotationSpan;
           var closestIdx = -1;
           var minCoverDist = Infinity;
 
           state.items.forEach(function (item, idx) {
             var theta = item.startAngle + phi;
 
+            // Position center on the circle
             item.style.left = (50 + 50 * Math.cos(theta)) + '%';
             item.style.top = (50 + 50 * Math.sin(theta)) + '%';
 
+            // Distance to active position (0 rad)
             var normalizedTheta = theta % (2 * Math.PI);
             if (normalizedTheta > Math.PI) normalizedTheta -= 2 * Math.PI;
             if (normalizedTheta < -Math.PI) normalizedTheta += 2 * Math.PI;
 
             var dist = Math.abs(normalizedTheta);
-            var limit = 90 * Math.PI / 180;
+            var limit = spacing;
             var t = Math.max(0, 1 - dist / limit);
 
-            var scale = 0.5 + 0.5 * t;
-            item.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(3) + ')';
+            // Interpolate width smoothly from 50% to 90%
+            var width = 50 + 40 * t;
+            item.style.width = width.toFixed(3) + '%';
+            item.style.aspectRatio = '16/9';
+            item.style.transform = 'translate(-50%, -50%)';
 
-            var iframe = item.querySelector('.rotator-video__video');
-            var cover = item.querySelector('.rotator-video__cover');
+            // Fade cover and iframe
+            var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
+            var cover = item.querySelector('img');
             if (iframe) iframe.style.opacity = t.toFixed(3);
             if (cover) cover.style.opacity = (1 - t).toFixed(3);
 
@@ -626,7 +624,7 @@
 
   function controlVideos() {
     state.items.forEach(function (item, idx) {
-      var iframe = item.querySelector('.rotator-video__video');
+      var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
       if (!iframe || !iframe.contentWindow) return;
 
       var isCurrentActive = (idx === state.activeIdx);
@@ -643,7 +641,7 @@
         var data = JSON.parse(event.data);
         if (data.event === 'ready') {
           state.items.forEach(function (item, idx) {
-            var iframe = item.querySelector('.rotator-video__video');
+            var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
             if (iframe && iframe.contentWindow === event.source) {
               state.playersReady[idx] = true;
               if (idx === state.activeIdx) {
