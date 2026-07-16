@@ -487,7 +487,7 @@
       var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
       if (cover) gsap.set(cover, { clearProps: 'all' });
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
-      if (iframe) gsap.set(iframe, { clearProps: 'all' });
+      if (iframe) gsap.set(iframe, { clearProps: 'opacity' });
     });
 
     if (window.innerWidth < CONFIG.mobileBreakpoint) {
@@ -522,9 +522,27 @@
 
       // Auto-append api=1 to Vimeo iframes to enable postMessage API controls
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
-      if (iframe && iframe.src && iframe.src.indexOf('vimeo.com') !== -1 && iframe.src.indexOf('api=1') === -1) {
-        var separator = iframe.src.indexOf('?') === -1 ? '?' : '&';
-        iframe.src = iframe.src + separator + 'api=1';
+      if (iframe) {
+        iframe.style.position = 'absolute';
+        iframe.style.top = '0';
+        iframe.style.left = '0';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.borderRadius = '8px';
+        
+        var embed = item.querySelector('.w-embed');
+        if (embed) {
+          embed.style.position = 'absolute';
+          embed.style.top = '0';
+          embed.style.left = '0';
+          embed.style.width = '100%';
+          embed.style.height = '100%';
+        }
+        
+        if (iframe.src && iframe.src.indexOf('vimeo.com') !== -1 && iframe.src.indexOf('api=1') === -1) {
+          var separator = iframe.src.indexOf('?') === -1 ? '?' : '&';
+          iframe.src = iframe.src + separator + 'api=1';
+        }
       }
     });
 
