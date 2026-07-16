@@ -582,7 +582,7 @@
       ease: 'none',
       scrollTrigger: {
         trigger: section,
-        start: 'center center+=40px',
+        start: 'center center+=80px',
         end: CONFIG.pinDistance,
         pin: true,
         scrub: 0.1,
