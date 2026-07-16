@@ -453,7 +453,7 @@
   gsap.registerPlugin(ScrollTrigger);
 
   var CONFIG = {
-    mobileBreakpoint: 991,
+    mobileBreakpoint: 0,
     pinDistance: '+=1200',
     spacingMode: 'quarter' // 'quarter' (90 degrees) or 'dynamic' (360 / items.length)
   };
@@ -585,7 +585,7 @@
         start: 'center center',
         end: CONFIG.pinDistance,
         pin: true,
-        scrub: 0.5,
+        scrub: 0.1,
         snap: {
           snapTo: 1 / (N - 1),
           duration: { min: 0.2, max: 0.5 },
