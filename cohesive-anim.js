@@ -6,7 +6,7 @@
     totalProgress: 0.4,             // ~144 degrees of rotation (subtle but visible orbit)
     pinDistance: '+=1500',          // pin for 1500px of scrolling (slow, deliberate)
     pinDistanceMobile: '+=900',
-    mobileBreakpoint: 1024,
+    mobileBreakpoint: 1200,
     minWrapperHeight: 560,          // ensures a reasonable pill orbit area
     scaleStart: 0.6,                // items begin at 70% of their actual size (uniform)
     scaleEnd: 1.0,                  // items grow to 100% of their actual size
@@ -22,10 +22,7 @@
   }
 
   // Compute position along a pill-shaped (rounded-rectangle) path
-  //   progress 0    = center of top edge
-  //   progress 0.25 = middle of right edge
-  //   progress 0.5  = center of bottom edge
-  //   progress 0.75 = middle of left edge
+
   function getPillPosition(progress, w, h) {
     var r = Math.max(0, h / 2);
     var flatWidth = Math.max(0, w - 2 * r);
@@ -98,6 +95,13 @@
       if (prev.tl) prev.tl.kill();
       gsap.set(items, { clearProps: 'position,left,top,transform,opacity,width,maxWidth,zIndex,pointerEvents' });
       if (heading) gsap.set(heading, { clearProps: 'position,left,top,transform,zIndex' });
+    }
+
+    // Disable on screens smaller than the mobile breakpoint
+    if (window.innerWidth < CONFIG.mobileBreakpoint) {
+      wrapper.style.minHeight = '';
+      window.cohesiveAnimState = null;
+      return;
     }
 
     // Measure wrapper WHILE items are still in flow, so we get the natural height
