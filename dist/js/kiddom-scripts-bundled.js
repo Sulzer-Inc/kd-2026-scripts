@@ -9,6 +9,16 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./kiddom-scripts.js"
+/*!***************************!*\
+  !*** ./kiddom-scripts.js ***!
+  \***************************/
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+
+eval("{// =============================================================================\n// JS Entry Point � Main Manifest\n// Bundles to: js/kiddom-scripts-bundled.js\n// =============================================================================\n\n// Used in Homepage\n__webpack_require__(/*! ./modules/hero-anim.js */ \"./modules/hero-anim.js\");\n__webpack_require__(/*! ./modules/cohesive-anim.js */ \"./modules/cohesive-anim.js\");\n__webpack_require__(/*! ./modules/product-cards.js */ \"./modules/product-cards.js\");\n\n// Atlas page\n__webpack_require__(/*! ./modules/circular-video-orbit-rotator.js */ \"./modules/circular-video-orbit-rotator.js\");\n\n//# sourceURL=webpack:///./kiddom-scripts.js?\n}");
+
+/***/ },
+
 /***/ "./modules/circular-video-orbit-rotator.js"
 /*!*************************************************!*\
   !*** ./modules/circular-video-orbit-rotator.js ***!
@@ -51,15 +61,42 @@ eval("{// ======================================================================
 
 /******/ 	});
 /************************************************************************/
+/******/ 	// The module cache
+/******/ 	const __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		const module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			const e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	__webpack_modules__["./modules/circular-video-orbit-rotator.js"]();
-/******/ 	__webpack_modules__["./modules/cohesive-anim.js"]();
-/******/ 	__webpack_modules__["./modules/hero-anim.js"]();
-/******/ 	let __webpack_exports__ = {};
-/******/ 	__webpack_modules__["./modules/product-cards.js"]();
+/******/ 	let __webpack_exports__ = __webpack_require__("./kiddom-scripts.js");
 /******/ 	
 /******/ })()
 ;

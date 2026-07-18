@@ -20,8 +20,8 @@ const webpack = require('webpack-stream');
 // var styleWatch   = '../src/sass/**/*.scss';  // all SCSS including partials — watched for changes
 // var styleDIST    = '../css/';
 
-var scriptSRC   = './modules/*.js';     // entry point only — webpack resolves imports
-var scriptWatch = './modules/**/*.js';  // all JS including modules — watched for changes
+var scriptSRC   = './kiddom-scripts.js';     // entry point only — webpack resolves imports
+var scriptWatch = ['./kiddom-scripts.js', './modules/**/*.js'];  // all JS including modules — watched for changes
 var scriptDIST  = './dist/js/';
 
 // function compileCss() {
