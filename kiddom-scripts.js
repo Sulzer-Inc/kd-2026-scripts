@@ -10,3 +10,6 @@ require('./modules/product-cards.js');
 
 // Atlas page
 require('./modules/circular-video-orbit-rotator.js');
+
+// Vimeo Slider controller
+require('./modules/vimeo-vid-slider.js');
