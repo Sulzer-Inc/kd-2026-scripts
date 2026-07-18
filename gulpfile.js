@@ -56,6 +56,14 @@ function watch() {
     browserSync.init({
         proxy: 'https://kiddom-staging.webflow.io/',
         open: false, // do not automatically open browser
+        serveStatic: ['.'], // Serve local files
+        rewriteRules: [
+            {
+                // Match raw.githack.com script URL (either unbundled or bundled) and point to local copy
+                match: /https:\/\/raw\.githack\.com\/Sulzer-Inc\/kd-2026-scripts\/main\/(kiddom-2026-scripts\.js|dist\/js\/kiddom-scripts-bundled\.js)/g,
+                replace: '/dist/js/kiddom-scripts-bundled.js'
+            }
+        ]
     });
     // gulp.watch(styleWatch, compileCss);
     gulp.watch(scriptWatch, jspack);
