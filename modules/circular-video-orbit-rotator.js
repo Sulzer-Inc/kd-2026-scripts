@@ -6,8 +6,9 @@
 
   var CONFIG = {
     mobileBreakpoint: 0,
-    pinDistance: '+=1200',
-    spacingMode: 'quarter' // 'quarter' (90 degrees) or 'dynamic' (360 / items.length)
+    basePinDistancePerStep: 500, // scroll px per item transition
+    minPinDistance: 1200,        // minimum scroll pin distance
+    spacingMode: 'quarter'       // 'quarter' (90 deg) or 'dynamic' (360 / N)
   };
 
   var state = {
@@ -16,6 +17,14 @@
     activeIdx: 0,
     playersReady: {}
   };
+
+  function getItemLogicalIndex(item, defaultIdx) {
+    var match = item.className.match(/vid-(\d+)/);
+    if (match && match[1]) {
+      return parseInt(match[1], 10) - 1;
+    }
+    return defaultIdx;
+  }
 
   function initRotatorAnimation() {
     var section = document.querySelector('.inside-every-lesson');
@@ -55,22 +64,14 @@
     var N = state.items.length;
     var spacing = (CONFIG.spacingMode === 'quarter') ? (Math.PI / 2) : (2 * Math.PI / N);
 
-    // Calculate starting angles based on Webflow classes
+    // Calculate starting angles dynamically based on logical index
     state.items.forEach(function (item, idx) {
       item.style.position = 'absolute';
       item.style.maxWidth = 'none'; // clear CSS max-width limits to allow dynamic sizing
 
-      var startAngle = 0;
-      if (item.classList.contains('vid-2')) {
-        startAngle = 0; // right (active)
-      } else if (item.classList.contains('vid-3')) {
-        startAngle = spacing; // bottom
-      } else if (item.classList.contains('vid-1')) {
-        startAngle = -spacing; // top
-      } else {
-        startAngle = idx * spacing;
-      }
-      item.startAngle = startAngle;
+      var logicalIdx = getItemLogicalIndex(item, idx);
+      item.logicalIndex = logicalIdx;
+      item.startAngle = -logicalIdx * spacing;
 
       // Auto-append api=1 to Vimeo iframes to enable postMessage API controls
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
@@ -98,27 +99,26 @@
       }
     });
 
-    var startRotation, endRotation;
-    if (CONFIG.spacingMode === 'quarter') {
-      startRotation = -spacing;
-      endRotation = spacing;
-    } else {
-      startRotation = 0;
-      endRotation = (N - 1) * spacing;
-    }
-    var rotationSpan = endRotation - startRotation;
+    var totalSteps = Math.max(1, N - 1);
+    var rotationSpan = totalSteps * spacing;
 
     // Set starting positions
     state.items.forEach(function (item) {
-      var theta = item.startAngle + startRotation;
+      var theta = item.startAngle; // at progress = 0, phi = 0
       item.style.left = (50 + 50 * Math.cos(theta)) + '%';
       item.style.top = (50 + 50 * Math.sin(theta)) + '%';
       
-      var isCurrentActive = Math.abs(theta % (2 * Math.PI)) < 0.01;
+      var normalizedTheta = theta % (2 * Math.PI);
+      if (normalizedTheta > Math.PI) normalizedTheta -= 2 * Math.PI;
+      if (normalizedTheta < -Math.PI) normalizedTheta += 2 * Math.PI;
+      var dist = Math.abs(normalizedTheta);
+
+      var isCurrentActive = dist < 0.01;
       var width = isCurrentActive ? 90 : 50;
       item.style.width = width + '%';
       item.style.aspectRatio = '16/9';
       item.style.transform = 'translate(-50%, -50%)';
+      item.style.zIndex = isCurrentActive ? '100' : '10';
 
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
       var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
@@ -129,23 +129,25 @@
     var proxy = { progress: 0 };
     state.activeIdx = 0;
 
+    var calculatedPinDistance = '+=' + Math.max(CONFIG.minPinDistance, totalSteps * CONFIG.basePinDistancePerStep);
+
     state.tl = gsap.to(proxy, {
       progress: 1.0,
       ease: 'none',
       scrollTrigger: {
         trigger: section,
         start: 'center center+=130px',
-        end: CONFIG.pinDistance,
+        end: calculatedPinDistance,
         pin: true,
         scrub: 0.1,
         snap: {
-          snapTo: 1 / (N - 1),
+          snapTo: N > 1 ? (1 / totalSteps) : 1,
           duration: { min: 0.2, max: 0.5 },
           ease: 'power1.inOut'
         },
         invalidateOnRefresh: true,
         onUpdate: function (self) {
-          var phi = startRotation + self.progress * rotationSpan;
+          var phi = self.progress * rotationSpan;
           var closestIdx = -1;
           var minCoverDist = Infinity;
 
@@ -170,6 +172,7 @@
             item.style.width = width.toFixed(3) + '%';
             item.style.aspectRatio = '16/9';
             item.style.transform = 'translate(-50%, -50%)';
+            item.style.zIndex = Math.round(10 + 90 * t);
 
             // Fade cover and iframe
             var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
