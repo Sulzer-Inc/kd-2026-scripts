@@ -8,7 +8,8 @@
     mobileBreakpoint: 0,
     basePinDistancePerStep: 500, // scroll px per item transition
     minPinDistance: 1200,        // minimum scroll pin distance
-    spacingMode: 'quarter'       // 'quarter' (90 deg) or 'dynamic' (360 / N)
+    spacingMode: 'quarter',      // 'quarter' (90 deg) or 'dynamic' (360 / N)
+    startOffset: 0.25            // fraction of pin scroll to idle before rotation begins (0–1)
   };
 
   var state = {
@@ -131,6 +132,13 @@
 
     var calculatedPinDistance = '+=' + Math.max(CONFIG.minPinDistance, totalSteps * CONFIG.basePinDistancePerStep);
 
+    // Build explicit snap points that account for the startOffset idle zone.
+    // Item 0 snaps at progress 0; each subsequent item snaps proportionally within [startOffset, 1].
+    var snapPoints = [0];
+    for (var si = 1; si <= totalSteps; si++) {
+      snapPoints.push(CONFIG.startOffset + (si / totalSteps) * (1 - CONFIG.startOffset));
+    }
+
     state.tl = gsap.to(proxy, {
       progress: 1.0,
       ease: 'none',
@@ -141,13 +149,15 @@
         pin: true,
         scrub: 0.1,
         snap: {
-          snapTo: N > 1 ? (1 / totalSteps) : 1,
+          snapTo: snapPoints,
           duration: { min: 0.2, max: 0.5 },
           ease: 'power1.inOut'
         },
         invalidateOnRefresh: true,
         onUpdate: function (self) {
-          var phi = self.progress * rotationSpan;
+          // Idle for the first startOffset fraction, then rotate through the remainder
+          var rotateProgress = Math.max(0, (self.progress - CONFIG.startOffset) / (1 - CONFIG.startOffset));
+          var phi = rotateProgress * rotationSpan;
           var closestIdx = -1;
           var minCoverDist = Infinity;
 
