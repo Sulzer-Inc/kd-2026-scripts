@@ -16,7 +16,8 @@
     tl: null,
     items: [],
     activeIdx: 0,
-    playersReady: {}
+    playersReady: {},
+    players: {}
   };
 
   function getItemLogicalIndex(item, defaultIdx) {
@@ -258,15 +259,81 @@
     });
   }
 
-  function controlVideos() {
+  function initVimeoPlayers() {
+    if (!window.Vimeo || !window.Vimeo.Player) {
+      setTimeout(initVimeoPlayers, 100);
+      return;
+    }
+
     state.items.forEach(function (item, idx) {
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
-      if (!iframe || !iframe.contentWindow) return;
+      if (!iframe) return;
+
+      if (state.players[idx]) return;
+
+      var player = new Vimeo.Player(iframe);
+      state.players[idx] = player;
+
+      var startAttr = item.getAttribute('data-start') || iframe.getAttribute('data-start');
+      var endAttr = item.getAttribute('data-end') || iframe.getAttribute('data-end');
+
+      var startTime = null;
+      var endTime = null;
+
+      if (startAttr && endAttr) {
+        startTime = parseFloat(startAttr);
+        endTime = parseFloat(endAttr);
+      }
+
+      if (startTime !== null && endTime !== null) {
+        player.on('loaded', function () {
+          player.setCurrentTime(startTime).then(function () {
+            // Force play if this video is the active one
+            if (idx === state.activeIdx) {
+              player.play().catch(function () {});
+            }
+          }).catch(function () {});
+        });
+
+        player.on('timeupdate', function (data) {
+          if (data.seconds >= endTime || data.seconds < startTime) {
+            player.setCurrentTime(startTime).then(function () {
+              if (idx === state.activeIdx) {
+                player.play().catch(function () {});
+              }
+            }).catch(function () {});
+          }
+        });
+      }
 
       var isCurrentActive = (idx === state.activeIdx);
-      if (state.playersReady[idx]) {
-        var action = isCurrentActive ? 'play' : 'pause';
-        iframe.contentWindow.postMessage(JSON.stringify({ method: action }), '*');
+      if (isCurrentActive) {
+        player.play().catch(function () {});
+      } else {
+        player.pause().catch(function () {});
+      }
+    });
+  }
+
+  function controlVideos() {
+    state.items.forEach(function (item, idx) {
+      var player = state.players[idx];
+      var isCurrentActive = (idx === state.activeIdx);
+
+      if (player) {
+        if (isCurrentActive) {
+          player.play().catch(function () {});
+        } else {
+          player.pause().catch(function () {});
+        }
+      } else {
+        var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
+        if (!iframe || !iframe.contentWindow) return;
+
+        if (state.playersReady[idx]) {
+          var action = isCurrentActive ? 'play' : 'pause';
+          iframe.contentWindow.postMessage(JSON.stringify({ method: action }), '*');
+        }
       }
     });
   }
@@ -280,10 +347,12 @@
             var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
             if (iframe && iframe.contentWindow === event.source) {
               state.playersReady[idx] = true;
-              if (idx === state.activeIdx) {
-                iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
-              } else {
-                iframe.contentWindow.postMessage(JSON.stringify({ method: 'pause' }), '*');
+              if (!state.players[idx]) {
+                if (idx === state.activeIdx) {
+                  iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
+                } else {
+                  iframe.contentWindow.postMessage(JSON.stringify({ method: 'pause' }), '*');
+                }
               }
             }
           });
@@ -297,6 +366,7 @@
     if (!section) return;
 
     initRotatorAnimation();
+    initVimeoPlayers();
     ScrollTrigger.refresh();
   }
 
