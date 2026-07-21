@@ -103,7 +103,7 @@
     var totalSteps = Math.max(1, N - 1);
     var rotationSpan = totalSteps * spacing;
 
-    // Set starting positions
+    // Reset starting positions
     state.items.forEach(function (item) {
       var theta = item.startAngle; // at progress = 0, phi = 0
       item.style.left = (50 + 50 * Math.cos(theta)) + '%';
@@ -126,6 +126,58 @@
       if (iframe) iframe.style.opacity = isCurrentActive ? '1' : '0';
       if (cover) cover.style.opacity = isCurrentActive ? '0' : '1';
     });
+
+    var textItems = Array.prototype.slice.call(section.querySelectorAll('.rotator-video__txt'));
+    var txtWrapper = null;
+
+    if (textItems.length > 0) {
+      var firstTxt = textItems[0];
+      var parent = firstTxt.parentNode;
+      
+      txtWrapper = document.createElement('div');
+      txtWrapper.className = 'rotator-video__txt-wrapper';
+      txtWrapper.style.display = 'grid';
+      txtWrapper.style.gridTemplateColumns = '1fr';
+      
+      parent.insertBefore(txtWrapper, firstTxt);
+      
+      textItems.forEach(function (txt) {
+        txtWrapper.appendChild(txt);
+        txt.style.gridArea = '1 / 1';
+      });
+    }
+
+    function updateActiveText(activeIndex) {
+      var activeItem = state.items[activeIndex];
+      var logicalIdx = activeItem ? (activeItem.logicalIndex !== undefined ? activeItem.logicalIndex : activeIndex) : activeIndex;
+
+      textItems.forEach(function (txt, idx) {
+        if (txt.transitionTimeout) {
+          clearTimeout(txt.transitionTimeout);
+          txt.transitionTimeout = null;
+        }
+
+        if (idx === logicalIdx) {
+          txt.style.display = 'block';
+          var reflow = txt.offsetHeight;
+          txt.classList.add('rotator-video__txt--active');
+        } else {
+          var wasActive = txt.classList.contains('rotator-video__txt--active');
+          txt.classList.remove('rotator-video__txt--active');
+
+          if (wasActive) {
+            txt.transitionTimeout = setTimeout(function () {
+              txt.style.display = 'none';
+            }, 300);
+          } else {
+            txt.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    // Set starting active text
+    updateActiveText(0);
 
     var proxy = { progress: 0 };
     state.activeIdx = 0;
@@ -199,6 +251,7 @@
           if (closestIdx !== -1 && closestIdx !== state.activeIdx) {
             state.activeIdx = closestIdx;
             controlVideos();
+            updateActiveText(closestIdx);
           }
         }
       }
