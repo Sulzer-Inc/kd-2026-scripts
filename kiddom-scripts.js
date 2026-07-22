@@ -7,6 +7,7 @@
 require('./modules/hero-anim.js');
 require('./modules/cohesive-anim.js');
 require('./modules/product-cards.js');
+require('./modules/hero-noindex.js');
 
 // Atlas page
 require('./modules/circular-video-orbit-rotator.js');
