@@ -28,7 +28,7 @@
     if (window.productCardsTl) {
       if (window.productCardsTl.scrollTrigger) window.productCardsTl.scrollTrigger.kill(true);
       window.productCardsTl.kill();
-      gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__txt'], { clearProps: 'all' });
+      gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__item-txt'], { clearProps: 'all' });
     }
 
     var items = gsap.utils.toArray('.product-parallax__item');
@@ -49,7 +49,7 @@
 
       var state = i === 0 ? { scale: 1, y: 0 } : behindState(i);
       var img = item.querySelector('.product-parallax__item-content');
-      var txt = item.querySelector('.product-parallax__txt');
+      var txt = item.querySelector('.product-parallax__item-txt');
 
       if (img) gsap.set(img, { scale: state.scale, y: state.y });
       if (txt) gsap.set(txt, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30 });
@@ -61,19 +61,19 @@
     var rightX = textMaxWidth + 32;
 
     items.forEach(function (item) {
-      var txt = item.querySelector('.product-parallax__txt');
+      var txt = item.querySelector('.product-parallax__item-txt');
       if (!txt) return;
       
       if (!isMobile) {
         txt.style.maxWidth = textMaxWidth + 'px';
-        gsap.set(txt, { x: txt.classList.contains('product-parallax__txt--right') ? rightX : leftX, y: 30, opacity: 0 });
+        gsap.set(txt, { x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX, y: 30, opacity: 0 });
       } else {
         txt.style.maxWidth = '100%';
         gsap.set(txt, { x: 0, y: 30, opacity: 0 });
       }
     });
     
-    gsap.set(items[0].querySelector('.product-parallax__txt'), { opacity: 1, y: 0 });
+    gsap.set(items[0].querySelector('.product-parallax__item-txt'), { opacity: 1, y: 0 });
 
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
@@ -102,9 +102,9 @@
     items.forEach(function (item, i) {
       if (i === 0) return;
       var prev = items[i - 1];
-      var prevTxt = prev.querySelector('.product-parallax__txt');
+      var prevTxt = prev.querySelector('.product-parallax__item-txt');
       var prevImg = prev.querySelector('.product-parallax__item-content');
-      var currTxt = item.querySelector('.product-parallax__txt');
+      var currTxt = item.querySelector('.product-parallax__item-txt');
       var currImg = item.querySelector('.product-parallax__item-content');
       var currStart = behindState(i);
 
