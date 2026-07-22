@@ -28,7 +28,7 @@
     if (window.productCardsTl) {
       if (window.productCardsTl.scrollTrigger) window.productCardsTl.scrollTrigger.kill(true);
       window.productCardsTl.kill();
-      gsap.set([section, '.product-parallax__item', '.product-parallax__img', '.product-parallax__txt'], { clearProps: 'all' });
+      gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__txt'], { clearProps: 'all' });
     }
 
     var items = gsap.utils.toArray('.product-parallax__item');
@@ -48,7 +48,7 @@
       });
 
       var state = i === 0 ? { scale: 1, y: 0 } : behindState(i);
-      var img = item.querySelector('.product-parallax__img');
+      var img = item.querySelector('.product-parallax__item-content');
       var txt = item.querySelector('.product-parallax__txt');
 
       if (img) gsap.set(img, { scale: state.scale, y: state.y });
@@ -103,9 +103,9 @@
       if (i === 0) return;
       var prev = items[i - 1];
       var prevTxt = prev.querySelector('.product-parallax__txt');
-      var prevImg = prev.querySelector('.product-parallax__img');
+      var prevImg = prev.querySelector('.product-parallax__item-content');
       var currTxt = item.querySelector('.product-parallax__txt');
-      var currImg = item.querySelector('.product-parallax__img');
+      var currImg = item.querySelector('.product-parallax__item-content');
       var currStart = behindState(i);
 
       if (prevTxt) {
