@@ -119,7 +119,7 @@
       var width = isCurrentActive ? 90 : 50;
       item.style.width = width + '%';
       item.style.aspectRatio = '16/9';
-      item.style.transform = 'translate(-50%, -50%)';
+      item.style.transform = 'translate(-60%, -50%)';
       item.style.zIndex = isCurrentActive ? '100' : '10';
 
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
@@ -234,7 +234,7 @@
             var width = 50 + 40 * t;
             item.style.width = width.toFixed(3) + '%';
             item.style.aspectRatio = '16/9';
-            item.style.transform = 'translate(-50%, -50%)';
+            item.style.transform = 'translate(-60%, -50%)';
             item.style.zIndex = Math.round(10 + 90 * t);
 
             // Fade cover and iframe
