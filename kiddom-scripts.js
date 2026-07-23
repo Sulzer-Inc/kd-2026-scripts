@@ -9,6 +9,7 @@ require('./modules/svg-path-animator.js');
 require('./modules/cohesive-anim.js');
 require('./modules/product-cards.js');
 require('./modules/hero-noindex.js');
+require('./modules/sticky-us-map.js');
 
 // Atlas page
 require('./modules/circular-video-orbit-rotator.js');
