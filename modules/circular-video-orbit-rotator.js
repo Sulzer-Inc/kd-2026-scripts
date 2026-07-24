@@ -199,12 +199,15 @@
       snapPoints.push(CONFIG.startOffset + (si / totalSteps) * (1 - CONFIG.startOffset));
     }
 
+    var ww = window.innerWidth;
+    var startPos = ww < 992 ? 'center center' : 'center center+=130px';
+
     state.tl = gsap.to(proxy, {
       progress: 1.0,
       ease: 'none',
       scrollTrigger: {
         trigger: section,
-        start: 'center center+=130px',
+        start: startPos,
         end: calculatedPinDistance,
         pin: true,
         scrub: 0.1,
