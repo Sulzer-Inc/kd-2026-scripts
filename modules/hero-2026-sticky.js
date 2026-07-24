@@ -3,17 +3,17 @@
 // ============================================================================
 (function () {
   function initHeroNoIndex() {
-    var element = document.querySelector('.hero-2026--noindex');
+    var element = document.querySelector('.hero-2026--sticky');
     if (!element) return;
 
     var isHidden = false;
 
     function handleScroll() {
-      // 200vh is 2 * viewport height
-      var vh200 = window.innerHeight * 2;
+      // 100vh is 1 * viewport height
+      var vh100 = window.innerHeight;
       var currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-      if (currentScroll > vh200) {
+      if (currentScroll > vh100) {
         if (!isHidden) {
           element.style.opacity = '0';
           element.style.pointerEvents = 'none';

@@ -8,7 +8,7 @@ require('./modules/hero-anim.js');
 require('./modules/svg-path-animator.js');
 require('./modules/cohesive-anim.js');
 require('./modules/product-cards.js');
-require('./modules/hero-noindex.js');
+require('./modules/hero-2026-sticky.js');
 require('./modules/sticky-us-map.js');
 
 // Atlas page
