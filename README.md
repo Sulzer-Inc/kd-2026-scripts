@@ -30,7 +30,7 @@ The scripts are served to Webflow via CDNs, which aggressively cache files to im
 ### jsDelivr Cache Purge Links
 Clicking this link will manually purge the jsDelivr cache and force it to fetch the latest version from GitHub. It will return a JSON response indicating whether the purge was successful.
 
-* **[Purge Bundled Script](https://purge.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js)**
+* **<a href="https://purge.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js" target="_blank">Purge Bundled Script</a>**
 
 ### Githack
 * **`raw.githack.com` (Development):** The cache automatically expires every **1 minute**. You do not need to manually purge it; just wait 60 seconds after your push.
@@ -40,7 +40,7 @@ Clicking this link will manually purge the jsDelivr cache and force it to fetch 
 
 ## Webflow Script Injection Snippet
 
-If you need to re-add or reference the script injection code used in Webflow, here it is. This automatically serves the jsDelivr version on production (`kiddom.co`) and the Githack version on staging or the Webflow designer.
+If you need to re-add or reference the script injection code used in Webflow, here it is. **This should be pasted into the "Before `</body>` tag" section in Webflow's Custom Code settings.** This automatically serves the jsDelivr version on production (`kiddom.co`) and the Githack version on staging or the Webflow designer.
 
 ```html
 <!-- Consolidated Kiddom Scripts -->
