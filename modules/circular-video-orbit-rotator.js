@@ -29,7 +29,7 @@
   }
 
   function initRotatorAnimation() {
-    var section = document.querySelector('.inside-every-lesson');
+    var section = document.querySelector('.rotator-video__container');
     if (!section) return;
 
     var container = section.querySelector('.rotator-video');
@@ -92,6 +92,13 @@
           embed.style.left = '0';
           embed.style.width = '100%';
           embed.style.height = '100%';
+        }
+
+        // Swap data-src to src so it doesn't load/autoplay in Webflow Designer
+        var dataSrc = iframe.getAttribute('data-src');
+        if (dataSrc) {
+          iframe.setAttribute('src', dataSrc);
+          iframe.removeAttribute('data-src'); // clean up so it doesn't run twice
         }
         
         if (iframe.src && iframe.src.indexOf('vimeo.com') !== -1 && iframe.src.indexOf('api=1') === -1) {
