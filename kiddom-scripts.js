@@ -7,7 +7,6 @@
 require('./modules/vimeo-global.js');
 
 // Used in Homepage
-require('./modules/hero-anim.js');
 require('./modules/svg-path-animator.js');
 require('./modules/cohesive-anim.js');
 require('./modules/product-cards.js');
