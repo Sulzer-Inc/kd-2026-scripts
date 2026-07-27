@@ -40,6 +40,7 @@
       }
 
       // 3. Read config from data attributes or fallback to defaults
+      // Adjust 'top 75%' below to change viewport trigger height (e.g., 'top 95%' or 'top 100%' for immediate)
       var startVal = container.getAttribute('data-anim-start') || 'top 75%';
       var repeatVal = container.getAttribute('data-anim-repeat');
       repeatVal = repeatVal !== null ? parseInt(repeatVal, 10) : -1;
@@ -87,7 +88,7 @@
             amount: 1.2,
             from: 'random'
           }
-        }, 1);
+        }, 1); // Delay offset (seconds): starts 1s after traces. Lower this to make fades start faster.
       }
     });
   }
@@ -95,11 +96,13 @@
   // Hook up triggers
   document.addEventListener('DOMContentLoaded', initSvgAnimations);
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    // Safety delay to allow elements and GSAP to load before measuring path lengths
     setTimeout(initSvgAnimations, 100);
   }
 
   // Webflow compatibility
   if (window.Webflow) {
+    // Extra buffer to let Webflow DOM elements render fully
     window.Webflow.push(function () { setTimeout(initSvgAnimations, 200); });
   }
 })();
