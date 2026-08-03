@@ -57,7 +57,7 @@
       left: '50%',
       xPercent: -50,
       yPercent: -50,
-      marginTop: '150px',
+      marginTop: '0',
       width: '100%',
       zIndex: 1,
       display: 'flex',
