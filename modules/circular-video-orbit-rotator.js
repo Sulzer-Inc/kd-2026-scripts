@@ -284,38 +284,6 @@
       var player = new Vimeo.Player(iframe);
       state.players[idx] = player;
 
-      var startAttr = item.getAttribute('data-start') || iframe.getAttribute('data-start');
-      var endAttr = item.getAttribute('data-end') || iframe.getAttribute('data-end');
-
-      var startTime = null;
-      var endTime = null;
-
-      if (startAttr && endAttr) {
-        startTime = parseFloat(startAttr);
-        endTime = parseFloat(endAttr);
-      }
-
-      if (startTime !== null && endTime !== null) {
-        player.on('loaded', function () {
-          player.setCurrentTime(startTime).then(function () {
-            // Force play if this video is the active one
-            if (idx === state.activeIdx) {
-              player.play().catch(function () {});
-            }
-          }).catch(function () {});
-        });
-
-        player.on('timeupdate', function (data) {
-          if (data.seconds >= endTime || data.seconds < startTime) {
-            player.setCurrentTime(startTime).then(function () {
-              if (idx === state.activeIdx) {
-                player.play().catch(function () {});
-              }
-            }).catch(function () {});
-          }
-        });
-      }
-
       var isCurrentActive = (idx === state.activeIdx);
       if (isCurrentActive) {
         player.play().catch(function () {});
