@@ -7,8 +7,8 @@
   gsap.registerPlugin(ScrollTrigger);
 
   var CONFIG = {
-    scrollDistanceVh: 6.5,   // Total scroll length of pin
-    cardScrollDuration: 3,   // Time each card takes to travel from bottom to top
+    scrollDistanceVh: 3,   // Total scroll length of pin
+    cardScrollDuration: 2,   // Time each card takes to travel from bottom to top
     gapVh: 70,               // Vertical gap between card centers in vh
     mobileBreakpoint: 1024,
   };
