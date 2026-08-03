@@ -5,7 +5,7 @@
   gsap.registerPlugin(ScrollTrigger);
 
   var CONFIG = {
-    scrollDistanceVh: 4,
+    scrollDistanceVh: 2,
     behindScaleStep: 0.05,
     behindYStep: 30,
     stepDuration: 1.5,

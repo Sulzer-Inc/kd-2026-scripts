@@ -9,7 +9,7 @@ require('./modules/vimeo-global.js');
 // Used in Homepage
 require('./modules/svg-path-animator.js');
 require('./modules/cohesive-anim.js');
-require('./modules/product-cards.js');
+require('./modules/product-parallax.js');
 require('./modules/hero-2026-sticky.js');
 require('./modules/sticky-us-map.js');
 
