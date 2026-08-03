@@ -126,7 +126,7 @@
         willChange: 'transform'
       });
       var startP = getItemStartProgress(item);
-      var pos = getPillPosition(startP, w, h);
+      var pos = getPillPosition(startP - CONFIG.totalProgress, w, h);
       applyItemTransform(item, pos, CONFIG.scaleStart);
     });
 
@@ -162,7 +162,7 @@
         for (var i = 0; i < itemArr.length; i++) {
           var item = itemArr[i];
           var startP = getItemStartProgress(item);
-          var currentP = startP + proxy.progress;
+          var currentP = startP - CONFIG.totalProgress + proxy.progress;
           var pos = getPillPosition(currentP, cw, ch);
           applyItemTransform(item, pos, itemScale);
         }
