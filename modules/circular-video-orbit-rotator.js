@@ -8,8 +8,8 @@
     mobileBreakpoint: 0,
     basePinDistancePerStep: 500, // scroll px per item transition
     minPinDistance: 1200,        // minimum scroll pin distance
-    spacingMode: 'quarter',      // 'quarter' (90 deg) or 'dynamic' (360 / N)
-    startOffset: 0.25            // fraction of pin scroll to idle before rotation begins (0–1)
+    spacingMode: 'dynamic',      // 'quarter' (90 deg) or 'dynamic' (360 / N)
+    startOffset: 0.125            // fraction of pin scroll to idle before rotation begins (0–1)
   };
 
   var state = {
@@ -132,7 +132,7 @@
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
       var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
       if (iframe) iframe.style.opacity = isCurrentActive ? '1' : '0';
-      if (cover) cover.style.opacity = isCurrentActive ? '0' : '1';
+      if (cover) cover.style.opacity = '1';
     });
 
     var textItems = Array.prototype.slice.call(section.querySelectorAll('.rotator-video__txt'));
@@ -251,7 +251,7 @@
             var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
             var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
             if (iframe) iframe.style.opacity = t.toFixed(3);
-            if (cover) cover.style.opacity = (1 - t).toFixed(3);
+            if (cover) cover.style.opacity = '1';
 
             if (dist < minCoverDist) {
               minCoverDist = dist;
