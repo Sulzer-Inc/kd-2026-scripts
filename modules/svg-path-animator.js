@@ -49,7 +49,10 @@
       yoyoVal = yoyoVal !== null ? (yoyoVal === 'true') : true;
 
       var delayVal = container.getAttribute('data-anim-repeat-delay');
-      delayVal = delayVal !== null ? parseFloat(delayVal) : 1;
+      delayVal = delayVal !== null ? parseFloat(delayVal) : 0.1;
+
+      var holdVal = container.getAttribute('data-anim-hold-delay');
+      var holdDuration = holdVal !== null ? parseFloat(holdVal) : (yoyoVal ? 1.5 : 1);
 
       // 4. Create Timeline
       var tl = gsap.timeline({
@@ -89,6 +92,11 @@
             from: 'random'
           }
         }, 1); // Delay offset (seconds): starts 1s after traces. Lower this to make fades start faster.
+      }
+
+      // Add hold pause when fully drawn so artwork stays visible before reversing/restarting
+      if (holdDuration > 0) {
+        tl.to({}, { duration: holdDuration });
       }
     });
   }
