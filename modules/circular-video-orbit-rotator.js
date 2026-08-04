@@ -1,5 +1,5 @@
 // ============================================================================
-// 4. CIRCULAR VIDEO ORBIT ROTATOR
+// 4. CIRCULAR VIDEO ORBIT ROTATOR - Used on Atlas V2
 // ============================================================================
 (function () {
   gsap.registerPlugin(ScrollTrigger);
@@ -170,16 +170,8 @@
           var reflow = txt.offsetHeight;
           txt.classList.add('rotator-video__txt--active');
         } else {
-          var wasActive = txt.classList.contains('rotator-video__txt--active');
           txt.classList.remove('rotator-video__txt--active');
-
-          if (wasActive) {
-            txt.transitionTimeout = setTimeout(function () {
-              txt.style.display = 'none';
-            }, 300);
-          } else {
-            txt.style.display = 'none';
-          }
+          txt.style.display = 'none';
         }
       });
     }
