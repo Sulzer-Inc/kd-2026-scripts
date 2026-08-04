@@ -14,6 +14,12 @@
       if (container.dataset.svgAnimInitialized) return;
       container.dataset.svgAnimInitialized = 'true';
 
+      // Ensure overflow is visible on svg element(s)
+      var svgs = container.tagName === 'SVG' ? [container] : container.querySelectorAll('svg');
+      svgs.forEach(function (svg) {
+        svg.style.overflow = 'visible';
+      });
+
       var traces = container.querySelectorAll('.anim-trace');
       var fades = container.querySelectorAll('.anim-fade');
 
