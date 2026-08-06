@@ -147,7 +147,7 @@
       var dist = Math.abs(normalizedTheta);
 
       var isCurrentActive = dist < 0.01;
-      var width = isCurrentActive ? 90 : 50;
+      var width = isCurrentActive ? 100 : 50;
       item.style.width = width + '%';
       item.style.aspectRatio = '16/9';
       item.style.transform = 'translate(-60%, -50%)';
@@ -265,8 +265,8 @@
             var limit = spacing;
             var t = Math.max(0, 1 - dist / limit);
 
-            // Interpolate width smoothly from 50% to 90%
-            var width = 50 + 40 * t;
+            // Interpolate width smoothly from 50% to 100%
+            var width = 50 + 50 * t;
             item.style.width = width.toFixed(3) + '%';
             item.style.aspectRatio = '16/9';
             item.style.transform = 'translate(-60%, -50%)';
