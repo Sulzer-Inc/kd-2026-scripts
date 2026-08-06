@@ -37,6 +37,12 @@
 
       // 2. Prepare Fades (Solid shapes / elements)
       if (fades.length > 0) {
+        fades.forEach(function (elem) {
+          if (!elem.style.overflow) {
+            elem.style.overflow = 'visible';
+          }
+        });
+
         gsap.set(fades, { 
           fillOpacity: 0,
           scale: 0.5,
