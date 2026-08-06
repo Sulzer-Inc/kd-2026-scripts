@@ -8,7 +8,11 @@
     mobileBreakpoint: 0,
     basePinDistancePerStep: 500, // scroll px per item transition
     minPinDistance: 1200,        // minimum scroll pin distance
-    spacingMode: 'dynamic',      // 'quarter' (90 deg) or 'dynamic' (360 / N)
+    spacingMode: {
+      desktop: 'dynamic',        // 'quarter' (90 deg), 'dynamic' (360 / N), 'half' (180 deg), or degree number
+      tablet: 'dynamic',
+      mobile: 'dynamic'
+    },
     startOffset: 0.125            // fraction of pin scroll to idle before rotation begins (0–1)
   };
 
@@ -19,6 +23,26 @@
     playersReady: {},
     players: {}
   };
+
+  function getSpacing(N) {
+    var mode = CONFIG.spacingMode;
+    if (typeof mode === 'object' && mode !== null) {
+      var ww = window.innerWidth;
+      if (ww >= 990) {
+        mode = mode.desktop;
+      } else if (ww >= 768) {
+        mode = mode.tablet;
+      } else {
+        mode = mode.mobile;
+      }
+    }
+    if (typeof mode === 'number') {
+      return (mode * Math.PI) / 180;
+    }
+    if (mode === 'quarter') return Math.PI / 2;
+    if (mode === 'half') return Math.PI;
+    return (2 * Math.PI) / N; // default: 'dynamic'
+  }
 
   function getItemLogicalIndex(item, defaultIdx) {
     var match = item.className.match(/vid-(\d+)/);
@@ -64,7 +88,7 @@
     }
 
     var N = state.items.length;
-    var spacing = (CONFIG.spacingMode === 'quarter') ? (Math.PI / 2) : (2 * Math.PI / N);
+    var spacing = getSpacing(N);
 
     // Calculate starting angles dynamically based on logical index
     state.items.forEach(function (item, idx) {
@@ -192,7 +216,16 @@
     }
 
     var ww = window.innerWidth;
-    var startPos = ww < 992 ? 'center center' : 'center center+=130px';
+    var startPos;
+    if (ww < 990) {
+      var headerEl = document.querySelector('.header-2026') || document.querySelector('.header') || document.querySelector('header') || document.querySelector('.w-nav');
+      var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+      var remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      var offset = (headerHeight + (2 * remPx)) / 2;
+      startPos = 'center center+=' + Math.round(offset) + 'px';
+    } else {
+      startPos = 'center center+=130px';
+    }
 
     state.tl = gsap.to(proxy, {
       progress: 1.0,

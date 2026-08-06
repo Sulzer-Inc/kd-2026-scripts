@@ -55,6 +55,7 @@ function jspack() {
 function watch() {
     browserSync.init({
         proxy: 'https://kiddom-staging.webflow.io/',
+        port: 3006,
         open: false, // do not automatically open browser
         serveStatic: ['.'], // Serve local files
         rewriteRules: [
