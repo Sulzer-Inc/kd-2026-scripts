@@ -13,7 +13,21 @@
       tablet: 'dynamic',
       mobile: 'dynamic'
     },
-    startOffset: 0.125,          // fraction of pin scroll to idle before rotation begins (0–1)
+    // Idle scroll fraction before rotation begins (~3 scroll wheel clicks allowance at 0.25)
+    startOffset: {
+      k4: 0.25,        // >= 2560px (~3 wheel clicks delay)
+      desktop: 0.25,   // >= 990px (~3 wheel clicks delay)
+      tablet: 0.125,   // >= 768px
+      mobile: 0.125    // < 768px
+    },
+
+    // Top locking / pinning start position offset (px offset or GSAP position string)
+    pinStartOffset: {
+      k4: 130,        // >= 2560px (center center+=130px)
+      desktop: 100,   // >= 990px (center center+=130px)
+      tablet: 60,     // >= 768px (center center+=60px)
+      mobile: 40      // < 768px (center center+=40px)
+    },
 
     // Item sizes & orbit radius (%)
     playingItemWidth: 135,       // width (%) of active playing item
@@ -31,6 +45,38 @@
     mobileMaxWidth: '85vw',                             // max width on mobile (< 768px)
     playingItemBoxShadow: '0 60px 50px -10px rgba(0,0,0,0.15)' // box-shadow on active playing item <img> (negative spread reduces side blur)
   };
+
+  function getStartOffset() {
+    var val = CONFIG.startOffset;
+    if (typeof val === 'number') return val;
+    if (typeof val === 'object' && val !== null) {
+      var ww = window.innerWidth;
+      if (ww >= 2560) return val.k4 !== undefined ? val.k4 : val.desktop;
+      if (ww >= 990) return val.desktop;
+      if (ww >= 768) return val.tablet;
+      return val.mobile;
+    }
+    return 0.125;
+  }
+
+  function getPinStartPos() {
+    var pos = CONFIG.pinStartOffset;
+    var ww = window.innerWidth;
+    var val;
+    if (typeof pos === 'string') return pos;
+    if (typeof pos === 'object' && pos !== null) {
+      if (ww >= 2560) val = pos.k4 !== undefined ? pos.k4 : pos.desktop;
+      else if (ww >= 990) val = pos.desktop;
+      else if (ww >= 768) val = pos.tablet;
+      else val = pos.mobile;
+    }
+    if (typeof val === 'number') {
+      var sign = val >= 0 ? '+=' : '-=';
+      return 'center center' + sign + Math.abs(val) + 'px';
+    }
+    if (typeof val === 'string') return val;
+    return ww < 990 ? 'center center+=60px' : 'center center+=130px';
+  }
 
   function getHorizontalOffset() {
     var offset = CONFIG.horizontalOffset;
@@ -245,24 +291,16 @@
 
     var calculatedPinDistance = '+=' + Math.max(CONFIG.minPinDistance, totalSteps * CONFIG.basePinDistancePerStep);
 
+    var currentStartOffset = getStartOffset();
+
     // Build explicit snap points that account for the startOffset idle zone.
     // Item 0 snaps at progress 0; each subsequent item snaps proportionally within [startOffset, 1].
     var snapPoints = [0];
     for (var si = 1; si <= totalSteps; si++) {
-      snapPoints.push(CONFIG.startOffset + (si / totalSteps) * (1 - CONFIG.startOffset));
+      snapPoints.push(currentStartOffset + (si / totalSteps) * (1 - currentStartOffset));
     }
 
-    var ww = window.innerWidth;
-    var startPos;
-    if (ww < 990) {
-      var headerEl = document.querySelector('.header-2026') || document.querySelector('.header') || document.querySelector('header') || document.querySelector('.w-nav');
-      var headerHeight = headerEl ? headerEl.offsetHeight : 0;
-      var remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      var offset = (headerHeight + (2 * remPx)) / 2;
-      startPos = 'center center+=' + Math.round(offset) + 'px';
-    } else {
-      startPos = 'center center+=130px';
-    }
+    var startPos = getPinStartPos();
 
     state.tl = gsap.to(proxy, {
       progress: 1.0,
@@ -281,7 +319,8 @@
         invalidateOnRefresh: true,
         onUpdate: function (self) {
           // Idle for the first startOffset fraction, then rotate through the remainder
-          var rotateProgress = Math.max(0, (self.progress - CONFIG.startOffset) / (1 - CONFIG.startOffset));
+          var currentStartOffset = getStartOffset();
+          var rotateProgress = Math.max(0, (self.progress - currentStartOffset) / (1 - currentStartOffset));
           var phi = rotateProgress * rotationSpan;
           var closestIdx = -1;
           var minCoverDist = Infinity;
