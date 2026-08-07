@@ -19,10 +19,46 @@
     // ITEM SIZES & ORBIT RADIUS CONFIGURATION (in %)
     // Change these values to adjust sizes centrally across initial & scroll states!
     // =========================================================================
-    playingItemWidth: 125,       // Width (%) of the active playing video item
+    playingItemWidth: 128,       // Width (%) of the active playing video item
     nonPlayingItemWidth: 40,     // Width (%) of non-playing rotating video items
-    orbitRadius: 50              // Orbital radius (%) from container center
+    orbitRadius: 50,             // Orbital radius (%) from container center
+
+    // =========================================================================
+    // RESPONSIVE PLAYING ITEM HORIZONTAL OFFSET (up to 4K screens)
+    // Adjust these values to shift ONLY the active playing item horizontally!
+    // Non-playing items stay in their standard orbital position (-50%).
+    // Value represents translate X percentage:
+    // - -50 = centered on orbital front point
+    // - -60 = shifted further left
+    // - -40 = shifted further right
+    // =========================================================================
+    horizontalOffset: {
+      k4: -65,        // 4K Ultra-wide screens (>= 2560px)
+      desktop: -60,   // Desktop screens (>= 990px)
+      tablet: -70,    // Tablet screens (>= 768px)
+      mobile: -65     // Mobile screens (< 768px)
+    },
+
+    // =========================================================================
+    // MOBILE MAX-WIDTH CONSTRAINT (< 768px)
+    // Restricts maximum width of the video item on mobile screens
+    // Set to 'none' or CSS value like '85vw'
+    // =========================================================================
+    mobileMaxWidth: '85vw'
   };
+
+  function getHorizontalOffset() {
+    var offset = CONFIG.horizontalOffset;
+    if (typeof offset === 'number') return offset;
+    if (typeof offset === 'object' && offset !== null) {
+      var ww = window.innerWidth;
+      if (ww >= 2560) return offset.k4 !== undefined ? offset.k4 : offset.desktop;
+      if (ww >= 990) return offset.desktop;
+      if (ww >= 768) return offset.tablet;
+      return offset.mobile;
+    }
+    return -60;
+  }
 
   var state = {
     tl: null,
@@ -157,9 +193,12 @@
       var isCurrentActive = dist < 0.01;
       
       var width = isCurrentActive ? CONFIG.playingItemWidth : CONFIG.nonPlayingItemWidth;
+      var activeOffsetX = getHorizontalOffset();
+      var offsetX = isCurrentActive ? activeOffsetX : -50;
       item.style.width = width + '%';
+      item.style.maxWidth = (window.innerWidth < 768 && CONFIG.mobileMaxWidth) ? CONFIG.mobileMaxWidth : 'none';
       item.style.aspectRatio = '16/9';
-      item.style.transform = 'translate(-60%, -50%)';
+      item.style.transform = 'translate(' + offsetX + '%, -50%)';
       item.style.zIndex = isCurrentActive ? '100' : '10';
 
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
@@ -276,9 +315,16 @@
 
             // Interpolate width smoothly from CONFIG.nonPlayingItemWidth to CONFIG.playingItemWidth
             var width = CONFIG.nonPlayingItemWidth + (CONFIG.playingItemWidth - CONFIG.nonPlayingItemWidth) * t;
+            
+            // Apply horizontal offset ONLY as the item becomes active (playing item)
+            // Non-playing items (t = 0) remain at standard -50% X position
+            var activeOffsetX = getHorizontalOffset();
+            var currentOffsetX = -50 + (activeOffsetX + 50) * t;
+
             item.style.width = width.toFixed(3) + '%';
+            item.style.maxWidth = (window.innerWidth < 768 && CONFIG.mobileMaxWidth) ? CONFIG.mobileMaxWidth : 'none';
             item.style.aspectRatio = '16/9';
-            item.style.transform = 'translate(-60%, -50%)';
+            item.style.transform = 'translate(' + currentOffsetX.toFixed(3) + '%, -50%)';
             item.style.zIndex = Math.round(10 + 90 * t);
 
             // Fade cover and iframe
