@@ -15,36 +15,21 @@
     },
     startOffset: 0.125,          // fraction of pin scroll to idle before rotation begins (0–1)
 
-    // =========================================================================
-    // ITEM SIZES & ORBIT RADIUS CONFIGURATION (in %)
-    // Change these values to adjust sizes centrally across initial & scroll states!
-    // =========================================================================
-    playingItemWidth: 128,       // Width (%) of the active playing video item
-    nonPlayingItemWidth: 40,     // Width (%) of non-playing rotating video items
-    orbitRadius: 50,             // Orbital radius (%) from container center
+    // Item sizes & orbit radius (%)
+    playingItemWidth: 128,       // width (%) of active playing item
+    nonPlayingItemWidth: 40,     // width (%) of non-playing rotating items
+    orbitRadius: 50,             // orbital radius (%) from container center
 
-    // =========================================================================
-    // RESPONSIVE PLAYING ITEM HORIZONTAL OFFSET (up to 4K screens)
-    // Adjust these values to shift ONLY the active playing item horizontally!
-    // Non-playing items stay in their standard orbital position (-50%).
-    // Value represents translate X percentage:
-    // - -50 = centered on orbital front point
-    // - -60 = shifted further left
-    // - -40 = shifted further right
-    // =========================================================================
+    // Horizontal offset for playing item (translate X %)
     horizontalOffset: {
-      k4: -65,        // 4K Ultra-wide screens (>= 2560px)
-      desktop: -60,   // Desktop screens (>= 990px)
-      tablet: -70,    // Tablet screens (>= 768px)
-      mobile: -65     // Mobile screens (< 768px)
+      k4: -65,        // >= 2560px
+      desktop: -60,   // >= 990px
+      tablet: -70,    // >= 768px
+      mobile: -65     // < 768px
     },
 
-    // =========================================================================
-    // MOBILE MAX-WIDTH CONSTRAINT (< 768px)
-    // Restricts maximum width of the video item on mobile screens
-    // Set to 'none' or CSS value like '85vw'
-    // =========================================================================
-    mobileMaxWidth: '85vw'
+    mobileMaxWidth: '85vw',                             // max width on mobile (< 768px)
+    playingItemBoxShadow: '0 60px 50px -10px rgba(0,0,0,0.2)' // box-shadow on active playing item <img> (negative spread reduces side blur)
   };
 
   function getHorizontalOffset() {
@@ -204,7 +189,10 @@
       var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
       var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
       if (iframe) iframe.style.opacity = isCurrentActive ? '1' : '0';
-      if (cover) cover.style.opacity = '1';
+      if (cover) {
+        cover.style.opacity = '1';
+        cover.style.boxShadow = isCurrentActive ? CONFIG.playingItemBoxShadow : 'none';
+      }
     });
 
     var textItems = Array.prototype.slice.call(section.querySelectorAll('.rotator-video__txt'));
@@ -313,11 +301,8 @@
             var limit = spacing;
             var t = Math.max(0, 1 - dist / limit);
 
-            // Interpolate width smoothly from CONFIG.nonPlayingItemWidth to CONFIG.playingItemWidth
+            // Interpolate width and horizontal offset for playing item
             var width = CONFIG.nonPlayingItemWidth + (CONFIG.playingItemWidth - CONFIG.nonPlayingItemWidth) * t;
-            
-            // Apply horizontal offset ONLY as the item becomes active (playing item)
-            // Non-playing items (t = 0) remain at standard -50% X position
             var activeOffsetX = getHorizontalOffset();
             var currentOffsetX = -50 + (activeOffsetX + 50) * t;
 
@@ -327,11 +312,14 @@
             item.style.transform = 'translate(' + currentOffsetX.toFixed(3) + '%, -50%)';
             item.style.zIndex = Math.round(10 + 90 * t);
 
-            // Fade cover and iframe
+            // Opacity & box-shadow
             var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
             var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
             if (iframe) iframe.style.opacity = t.toFixed(3);
-            if (cover) cover.style.opacity = '1';
+            if (cover) {
+              cover.style.opacity = '1';
+              cover.style.boxShadow = (t > 0.5) ? CONFIG.playingItemBoxShadow : 'none';
+            }
 
             if (dist < minCoverDist) {
               minCoverDist = dist;
