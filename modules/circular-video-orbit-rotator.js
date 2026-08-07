@@ -16,20 +16,20 @@
     startOffset: 0.125,          // fraction of pin scroll to idle before rotation begins (0–1)
 
     // Item sizes & orbit radius (%)
-    playingItemWidth: 128,       // width (%) of active playing item
+    playingItemWidth: 135,       // width (%) of active playing item
     nonPlayingItemWidth: 40,     // width (%) of non-playing rotating items
     orbitRadius: 50,             // orbital radius (%) from container center
 
     // Horizontal offset for playing item (translate X %)
     horizontalOffset: {
       k4: -65,        // >= 2560px
-      desktop: -60,   // >= 990px
+      desktop: -65,   // >= 990px
       tablet: -70,    // >= 768px
       mobile: -65     // < 768px
     },
 
     mobileMaxWidth: '85vw',                             // max width on mobile (< 768px)
-    playingItemBoxShadow: '0 60px 50px -10px rgba(0,0,0,0.2)' // box-shadow on active playing item <img> (negative spread reduces side blur)
+    playingItemBoxShadow: '0 60px 50px -10px rgba(0,0,0,0.15)' // box-shadow on active playing item <img> (negative spread reduces side blur)
   };
 
   function getHorizontalOffset() {
@@ -191,7 +191,8 @@
       if (iframe) iframe.style.opacity = isCurrentActive ? '1' : '0';
       if (cover) {
         cover.style.opacity = '1';
-        cover.style.boxShadow = isCurrentActive ? CONFIG.playingItemBoxShadow : 'none';
+        cover.style.transition = 'box-shadow 0.4s ease, opacity 0.3s ease';
+        cover.style.boxShadow = isCurrentActive ? CONFIG.playingItemBoxShadow : '';
       }
     });
 
@@ -312,13 +313,14 @@
             item.style.transform = 'translate(' + currentOffsetX.toFixed(3) + '%, -50%)';
             item.style.zIndex = Math.round(10 + 90 * t);
 
-            // Opacity & box-shadow
+            // Opacity & smooth box-shadow transition for active playing item (restores CSS default shadow on non-playing items)
             var iframe = item.tagName === 'IFRAME' ? item : item.querySelector('iframe');
             var cover = item.tagName === 'IMG' ? item : item.querySelector('img');
             if (iframe) iframe.style.opacity = t.toFixed(3);
             if (cover) {
               cover.style.opacity = '1';
-              cover.style.boxShadow = (t > 0.5) ? CONFIG.playingItemBoxShadow : 'none';
+              cover.style.transition = 'box-shadow 0.4s ease, opacity 0.3s ease';
+              cover.style.boxShadow = (dist < limit * 0.5) ? CONFIG.playingItemBoxShadow : '';
             }
 
             if (dist < minCoverDist) {
