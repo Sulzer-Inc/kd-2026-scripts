@@ -28,9 +28,12 @@ When you are ready to deploy your changes, simply commit and push your code to t
 The scripts are served to Webflow via CDNs, which aggressively cache files to improve performance. This means you might not see your changes immediately on the live site.
 
 ### jsDelivr Cache Purge Links
-Clicking this link will manually purge the jsDelivr cache and force it to fetch the latest version from GitHub. It will return a JSON response indicating whether the purge was successful.
+Clicking this link will manually purge the jsDelivr cache and force it to fetch the latest version from GitHub. It will return a JSON response indicating whether the purge was successful (`"purged": true`).
 
 * **<a href="https://purge.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js" target="_blank">Purge Bundled Script</a>**
+
+> [!NOTE]
+> **Rate Limiting / Throttling:** When a file path on `@main` is purged multiple times in a short window, jsDelivr rate-limits / throttles purge requests to protect its edge servers. If the JSON response shows `"throttled": true`, the API will ignore new purge attempts until the cooldown timer (`throttlingReset` ~8 minutes) expires.
 
 ### Githack
 * **`raw.githack.com` (Development):** The cache automatically expires every **1 minute**. You do not need to manually purge it; just wait 60 seconds after your push.

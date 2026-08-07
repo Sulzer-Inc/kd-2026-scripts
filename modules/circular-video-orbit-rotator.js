@@ -293,9 +293,8 @@
 
     var currentStartOffset = getStartOffset();
 
-    // Build explicit snap points that account for the startOffset idle zone.
-    // Item 0 snaps at progress 0; each subsequent item snaps proportionally within [startOffset, 1].
-    var snapPoints = [0];
+    // Build explicit snap points: 0 and currentStartOffset (Item 0 stationary), then subsequent item steps.
+    var snapPoints = [0, currentStartOffset];
     for (var si = 1; si <= totalSteps; si++) {
       snapPoints.push(currentStartOffset + (si / totalSteps) * (1 - currentStartOffset));
     }
