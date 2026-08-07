@@ -13,7 +13,15 @@
       tablet: 'dynamic',
       mobile: 'dynamic'
     },
-    startOffset: 0.125            // fraction of pin scroll to idle before rotation begins (0–1)
+    startOffset: 0.125,          // fraction of pin scroll to idle before rotation begins (0–1)
+
+    // =========================================================================
+    // ITEM SIZES & ORBIT RADIUS CONFIGURATION (in %)
+    // Change these values to adjust sizes centrally across initial & scroll states!
+    // =========================================================================
+    playingItemWidth: 125,       // Width (%) of the active playing video item
+    nonPlayingItemWidth: 40,     // Width (%) of non-playing rotating video items
+    orbitRadius: 50              // Orbital radius (%) from container center
   };
 
   var state = {
@@ -138,8 +146,8 @@
     // Reset starting positions
     state.items.forEach(function (item) {
       var theta = item.startAngle; // at progress = 0, phi = 0
-      item.style.left = (50 + 50 * Math.cos(theta)) + '%';
-      item.style.top = (50 + 50 * Math.sin(theta)) + '%';
+      item.style.left = (50 + CONFIG.orbitRadius * Math.cos(theta)) + '%';
+      item.style.top = (50 + CONFIG.orbitRadius * Math.sin(theta)) + '%';
       
       var normalizedTheta = theta % (2 * Math.PI);
       if (normalizedTheta > Math.PI) normalizedTheta -= 2 * Math.PI;
@@ -147,7 +155,8 @@
       var dist = Math.abs(normalizedTheta);
 
       var isCurrentActive = dist < 0.01;
-      var width = isCurrentActive ? 100 : 50;
+      
+      var width = isCurrentActive ? CONFIG.playingItemWidth : CONFIG.nonPlayingItemWidth;
       item.style.width = width + '%';
       item.style.aspectRatio = '16/9';
       item.style.transform = 'translate(-60%, -50%)';
@@ -252,9 +261,9 @@
           state.items.forEach(function (item, idx) {
             var theta = item.startAngle + phi;
 
-            // Position center on the circle
-            item.style.left = (50 + 50 * Math.cos(theta)) + '%';
-            item.style.top = (50 + 50 * Math.sin(theta)) + '%';
+            // Position on orbit circle based on CONFIG.orbitRadius
+            item.style.left = (50 + CONFIG.orbitRadius * Math.cos(theta)).toFixed(3) + '%';
+            item.style.top = (50 + CONFIG.orbitRadius * Math.sin(theta)).toFixed(3) + '%';
 
             // Distance to active position (0 rad)
             var normalizedTheta = theta % (2 * Math.PI);
@@ -265,8 +274,8 @@
             var limit = spacing;
             var t = Math.max(0, 1 - dist / limit);
 
-            // Interpolate width smoothly from 50% to 100%
-            var width = 50 + 50 * t;
+            // Interpolate width smoothly from CONFIG.nonPlayingItemWidth to CONFIG.playingItemWidth
+            var width = CONFIG.nonPlayingItemWidth + (CONFIG.playingItemWidth - CONFIG.nonPlayingItemWidth) * t;
             item.style.width = width.toFixed(3) + '%';
             item.style.aspectRatio = '16/9';
             item.style.transform = 'translate(-60%, -50%)';
