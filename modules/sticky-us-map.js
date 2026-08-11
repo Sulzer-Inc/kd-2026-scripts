@@ -206,6 +206,9 @@
         );
       }
     });
+
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
   }
 
   // Initial Boot

@@ -2,10 +2,13 @@
 // 3. COHESIVE PILLS ORBIT - Used on Homepage V2 2026 
 // ============================================================================
 (function () {
-  gsap.registerPlugin(ScrollTrigger);
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+  }
 
   var CONFIG = {
-    mobileBreakpoint: 1200,      // Breakpoint (px) e.g. 1200 (desktop active >= 1200px)
+    mobileBreakpoint: 768,       // Breakpoint (px) (desktop active >= 768px)
+    startPos: 'top top',         // ScrollTrigger start position: 'top top' pins section when aligned with screen top
     pinDistance: '+=1500',       // Desktop pin distance e.g. '+=1000' to '+=2500'
     pinDistanceMobile: '+=900',  // Mobile pin distance e.g. '+=600' to '+=1200'
     minWrapperHeight: 560,       // Container min-height (px) e.g. 400 to 700
@@ -75,16 +78,16 @@
   }
 
   function getItemStartProgress(item) {
-    if (item.classList.contains('cohesive-k12__item--right')) return 0.25;
-    if (item.classList.contains('cohesive-k12__item--bottom')) return 0.5;
-    if (item.classList.contains('cohesive-k12__item--left')) return 0.75;
+    if (item.classList.contains('cohesive-k12__item--right') || item.classList.contains('cohesive-k-12__item--right')) return 0.25;
+    if (item.classList.contains('cohesive-k12__item--bottom') || item.classList.contains('cohesive-k-12__item--bottom')) return 0.5;
+    if (item.classList.contains('cohesive-k12__item--left') || item.classList.contains('cohesive-k-12__item--left')) return 0.75;
     return 0;
   }
 
   function getItemKey(item) {
-    if (item.classList.contains('cohesive-k12__item--right')) return 'right';
-    if (item.classList.contains('cohesive-k12__item--bottom')) return 'bottom';
-    if (item.classList.contains('cohesive-k12__item--left')) return 'left';
+    if (item.classList.contains('cohesive-k12__item--right') || item.classList.contains('cohesive-k-12__item--right')) return 'right';
+    if (item.classList.contains('cohesive-k12__item--bottom') || item.classList.contains('cohesive-k-12__item--bottom')) return 'bottom';
+    if (item.classList.contains('cohesive-k12__item--left') || item.classList.contains('cohesive-k-12__item--left')) return 'left';
     return 'top';
   }
 
@@ -94,7 +97,7 @@
     item.style.transform = 'translate(-50%, -50%) scale(' + itemScale.toFixed(3) + ')';
 
     if (CONFIG.pseudoImage && CONFIG.pseudoImage.enabled) {
-      var pseudoImg = item.querySelector('.cohesive-k12__pseudo-img, .img-top, .img-left, .img-bottom, .img-right');
+      var pseudoImg = item.querySelector('.cohesive-k12__pseudo-img, .cohesive-k-12__pseudo-img, .img-top, .img-left, .img-bottom, .img-right');
       if (pseudoImg) {
         var key = getItemKey(item);
         var offsets = (CONFIG.pseudoImage.startOffsets && CONFIG.pseudoImage.startOffsets[key]) || { x: 0, y: 0 };
@@ -116,17 +119,24 @@
   }
 
   function initCohesiveAnimation() {
-    var section = document.querySelector('.cohesive-k-12');
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    if (gsap.registerPlugin) {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+
+    var section = document.querySelector('.cohesive-k-12, .cohesive-k12');
     if (!section) return;
 
-    var wrapper = section.querySelector('.cohesive-k12__content');
+    var wrapper = section.querySelector('.cohesive-k12__content, .cohesive-k-12__content');
     if (!wrapper) return;
 
-    var items = wrapper.querySelectorAll('.cohesive-k12__item');
+    wrapper.style.position = 'relative';
+
+    var items = wrapper.querySelectorAll('.cohesive-k12__item, .cohesive-k-12__item');
     if (items.length === 0) return;
 
-    var heading = wrapper.querySelector('.cohesive-k12__heading');
-    var pseudoImgs = wrapper.querySelectorAll('.cohesive-k12__pseudo-img, .img-top, .img-left, .img-bottom, .img-right');
+    var heading = wrapper.querySelector('.cohesive-k12__heading, .cohesive-k-12__heading');
+    var pseudoImgs = wrapper.querySelectorAll('.cohesive-k12__pseudo-img, .cohesive-k-12__pseudo-img, .img-top, .img-left, .img-bottom, .img-right');
 
     if (window.cohesiveAnimState) {
       var prev = window.cohesiveAnimState;
@@ -188,13 +198,12 @@
       ease: 'none',
       scrollTrigger: {
         trigger: section,
-        start: 'center center',
+        start: CONFIG.startPos || 'top top',
         end: pinDistance,
         scrub: 1,
         pin: true,
         pinSpacing: true,
-        invalidateOnRefresh: true,
-        anticipatePin: 1
+        invalidateOnRefresh: true
       },
       onUpdate: function () {
         var cw = wrapper.offsetWidth;
@@ -227,7 +236,9 @@
   }
 
   function startWhenReady() {
-    var section = document.querySelector('.cohesive-k-12');
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    var section = document.querySelector('.cohesive-k-12, .cohesive-k12');
     if (!section) return;
 
     var imgs = section.querySelectorAll('img');
@@ -236,9 +247,18 @@
       if (!imgs[i].complete) pending.push(imgs[i]);
     }
 
+    var hasRun = false;
+    var timerId = null;
+
     var run = function () {
+      if (hasRun) return;
+      hasRun = true;
+      if (timerId) clearTimeout(timerId);
       initCohesiveAnimation();
-      ScrollTrigger.refresh();
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+      }
     };
 
     if (pending.length === 0) {
@@ -255,7 +275,7 @@
       img.addEventListener('load', done);
       img.addEventListener('error', done);
     });
-    setTimeout(run, 2000);
+    timerId = setTimeout(run, 2000);
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

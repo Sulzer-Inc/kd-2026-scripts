@@ -453,6 +453,7 @@
 
     initRotatorAnimation();
     initVimeoPlayers();
+    ScrollTrigger.sort();
     ScrollTrigger.refresh();
   }
 

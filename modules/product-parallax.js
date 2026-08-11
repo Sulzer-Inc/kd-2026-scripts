@@ -150,7 +150,6 @@
         end: '+=' + (window.innerHeight * CONFIG.scrollDistanceVh),
         pin: section.closest('.products') || section,
         scrub: CONFIG.pinScrub,
-        anticipatePin: 1,
         invalidateOnRefresh: true,
         onRefresh: function(self) {
           if (self.spacer) {
@@ -206,6 +205,9 @@
 
     // Initialize Vimeo Players for cards
     initVimeoPlayersForCards(items);
+    
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') init();
