@@ -8,9 +8,9 @@
 
   var CONFIG = {
     mobileBreakpoint: 768,       // Breakpoint (px) (desktop active >= 768px)
-    startEntryPos: 'top 85%',    // Entry position: start rotation as soon as section enters screen
+    startEntryPos: 'top 85%',    // Entry position: start rotation as soon as section enters viewport
     startPinPos: 'top top',      // Pin position: pin section when top reaches screen top
-    entryProgressFraction: 0.15, // Orbit progress completed during entry phase (15%)
+    entryProgressFraction: 0.15, // Orbit progress completed during unpinned entry phase (15%)
     pinDistance: '+=1500',       // Desktop pin distance e.g. '+=1000' to '+=2500'
     pinDistanceMobile: '+=900',  // Mobile pin distance e.g. '+=600' to '+=1200'
     minWrapperHeight: 560,       // Container min-height (px) e.g. 400 to 700
@@ -24,7 +24,7 @@
     pseudoImage: {
       enabled: true,             // Enable pseudo-image animation (true/false)
       scaleStart: 0.4,           // Image start scale e.g. 0.2 to 0.8
-      opacityStart: 1.0,         // Image start opacity e.g. 0.0 to 1.0
+      opacityStart: 0.3,         // Image start opacity e.g. 0.0 to 1.0
 
       // Start offsets (px) relative to native Webflow layout position (progress = 0)
       startOffsets: {
@@ -225,7 +225,7 @@
       }
     }
 
-    // PHASE 1: Entry phase animation (starts unpinned as section enters viewport top 85%)
+    // PHASE 1: Entry phase animation (starts unpinned as soon as section enters viewport top 85%)
     var entryTl = gsap.to(proxy, {
       progress: entryProgressMax,
       ease: 'none',
@@ -233,7 +233,7 @@
         trigger: section,
         start: CONFIG.startEntryPos || 'top 85%',
         end: CONFIG.startPinPos || 'top top',
-        scrub: 0.5,
+        scrub: true,
         pin: false,
         invalidateOnRefresh: true,
         onUpdate: renderOrbit
@@ -250,7 +250,7 @@
           trigger: section,
           start: CONFIG.startPinPos || 'top top',
           end: pinDistance,
-          scrub: 1,
+          scrub: true,
           pin: true,
           pinSpacing: true,
           invalidateOnRefresh: true,
