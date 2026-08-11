@@ -10,6 +10,7 @@
     pinDistanceMobile: '+=900',  // Mobile pin distance e.g. '+=600' to '+=1200'
     minWrapperHeight: 560,       // Container min-height (px) e.g. 400 to 700
     totalProgress: 0.4,          // Orbit rotation distance e.g. 0.2 to 0.8 (0.4 = 40% loop)
+    easePower: 3,                // Ease-out deceleration near ending e.g. 1 (linear), 2 (quad), 3 (cubic/Lassie style), 4 (quart)
     scaleStart: 0.4,             // Card start scale e.g. 0.3 to 0.8
     scaleEnd: 1.0,               // Card end scale e.g. 1.0
     scaleFinishAt: 0.8,          // Scale finish progress ratio e.g. 0.5 to 1.0
@@ -18,7 +19,7 @@
     pseudoImage: {
       enabled: true,             // Enable pseudo-image animation (true/false)
       scaleStart: 0.4,           // Image start scale e.g. 0.2 to 0.8
-      opacityStart: 1,         // Image start opacity e.g. 0.0 to 0.5
+      opacityStart: 1.0,         // Image start opacity e.g. 0.0 to 1.0
 
       // Start offsets (px) relative to native Webflow layout position (progress = 0)
       startOffsets: {
@@ -30,11 +31,14 @@
     }
   };
 
-  function power4Out(t) {
+  /**
+   * Configurable ease-out function (Lassie.ai style deceleration curve near ending)
+   */
+  function easeOut(t, power) {
     if (t <= 0) return 0;
     if (t >= 1) return 1;
-    var inv = 1 - t;
-    return 1 - inv * inv * inv * inv;
+    var p = power !== undefined ? power : 3;
+    return 1 - Math.pow(1 - t, p);
   }
 
   function getPillPosition(progress, w, h) {
@@ -198,16 +202,21 @@
         if (cw === 0 || ch === 0) return;
 
         var scrollNorm = proxy.progress / CONFIG.totalProgress;
+        var easePower = CONFIG.easePower !== undefined ? CONFIG.easePower : 3;
+
+        // Decelerate orbit movement smoothly as it approaches ending (Lassie.ai style)
+        var orbitEased = easeOut(scrollNorm, easePower);
+
         var scaleT = scrollNorm / CONFIG.scaleFinishAt;
         if (scaleT < 0) scaleT = 0;
         if (scaleT > 1) scaleT = 1;
-        var scaleEased = power4Out(scaleT);
+        var scaleEased = easeOut(scaleT, easePower);
         var itemScale = CONFIG.scaleStart + (CONFIG.scaleEnd - CONFIG.scaleStart) * scaleEased;
 
         for (var i = 0; i < itemArr.length; i++) {
           var item = itemArr[i];
           var startP = getItemStartProgress(item);
-          var currentP = startP - CONFIG.totalProgress + proxy.progress;
+          var currentP = startP - CONFIG.totalProgress + (CONFIG.totalProgress * orbitEased);
           var pos = getPillPosition(currentP, cw, ch);
           applyItemTransform(item, pos, itemScale, scaleEased);
         }
