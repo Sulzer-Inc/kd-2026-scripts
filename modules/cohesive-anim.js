@@ -8,7 +8,9 @@
 
   var CONFIG = {
     mobileBreakpoint: 768,       // Breakpoint (px) (desktop active >= 768px)
-    startPos: 'top top',         // ScrollTrigger start position: 'top top' pins section when aligned with screen top
+    startEntryPos: 'top 85%',    // Entry position: start rotation as soon as section enters screen
+    startPinPos: 'top top',      // Pin position: pin section when top reaches screen top
+    entryProgressFraction: 0.15, // Orbit progress completed during entry phase (15%)
     pinDistance: '+=1500',       // Desktop pin distance e.g. '+=1000' to '+=2500'
     pinDistanceMobile: '+=900',  // Mobile pin distance e.g. '+=600' to '+=1200'
     minWrapperHeight: 560,       // Container min-height (px) e.g. 400 to 700
@@ -140,6 +142,10 @@
 
     if (window.cohesiveAnimState) {
       var prev = window.cohesiveAnimState;
+      if (prev.entryTl && prev.entryTl.scrollTrigger) prev.entryTl.scrollTrigger.kill(true);
+      if (prev.entryTl) prev.entryTl.kill();
+      if (prev.mainTl && prev.mainTl.scrollTrigger) prev.mainTl.scrollTrigger.kill(true);
+      if (prev.mainTl) prev.mainTl.kill();
       if (prev.tl && prev.tl.scrollTrigger) prev.tl.scrollTrigger.kill(true);
       if (prev.tl) prev.tl.kill();
       gsap.set(items, { clearProps: 'position,left,top,transform,opacity,width,maxWidth,zIndex,pointerEvents' });
@@ -192,47 +198,68 @@
     var proxy = { progress: 0 };
     var isMobile = window.innerWidth < CONFIG.mobileBreakpoint;
     var pinDistance = isMobile ? CONFIG.pinDistanceMobile : CONFIG.pinDistance;
+    var entryProgressMax = CONFIG.totalProgress * (CONFIG.entryProgressFraction || 0.15);
 
-    var tl = gsap.to(proxy, {
-      progress: CONFIG.totalProgress,
+    function renderOrbit() {
+      var cw = wrapper.offsetWidth;
+      var ch = wrapper.offsetHeight;
+      if (cw === 0 || ch === 0) return;
+
+      var scrollNorm = proxy.progress / CONFIG.totalProgress;
+      var easePower = CONFIG.easePower !== undefined ? CONFIG.easePower : 3;
+
+      var orbitEased = easeOut(scrollNorm, easePower);
+
+      var scaleT = scrollNorm / CONFIG.scaleFinishAt;
+      if (scaleT < 0) scaleT = 0;
+      if (scaleT > 1) scaleT = 1;
+      var scaleEased = easeOut(scaleT, easePower);
+      var itemScale = CONFIG.scaleStart + (CONFIG.scaleEnd - CONFIG.scaleStart) * scaleEased;
+
+      for (var i = 0; i < itemArr.length; i++) {
+        var item = itemArr[i];
+        var startP = getItemStartProgress(item);
+        var currentP = startP - CONFIG.totalProgress + (CONFIG.totalProgress * orbitEased);
+        var pos = getPillPosition(currentP, cw, ch);
+        applyItemTransform(item, pos, itemScale, scaleEased);
+      }
+    }
+
+    // PHASE 1: Entry phase animation (starts unpinned as section enters viewport top 85%)
+    var entryTl = gsap.to(proxy, {
+      progress: entryProgressMax,
       ease: 'none',
       scrollTrigger: {
         trigger: section,
-        start: CONFIG.startPos || 'top top',
-        end: pinDistance,
-        scrub: 1,
-        pin: true,
-        pinSpacing: true,
-        invalidateOnRefresh: true
-      },
-      onUpdate: function () {
-        var cw = wrapper.offsetWidth;
-        var ch = wrapper.offsetHeight;
-        if (cw === 0 || ch === 0) return;
-
-        var scrollNorm = proxy.progress / CONFIG.totalProgress;
-        var easePower = CONFIG.easePower !== undefined ? CONFIG.easePower : 3;
-
-        // Decelerate orbit movement smoothly as it approaches ending (Lassie.ai style)
-        var orbitEased = easeOut(scrollNorm, easePower);
-
-        var scaleT = scrollNorm / CONFIG.scaleFinishAt;
-        if (scaleT < 0) scaleT = 0;
-        if (scaleT > 1) scaleT = 1;
-        var scaleEased = easeOut(scaleT, easePower);
-        var itemScale = CONFIG.scaleStart + (CONFIG.scaleEnd - CONFIG.scaleStart) * scaleEased;
-
-        for (var i = 0; i < itemArr.length; i++) {
-          var item = itemArr[i];
-          var startP = getItemStartProgress(item);
-          var currentP = startP - CONFIG.totalProgress + (CONFIG.totalProgress * orbitEased);
-          var pos = getPillPosition(currentP, cw, ch);
-          applyItemTransform(item, pos, itemScale, scaleEased);
-        }
+        start: CONFIG.startEntryPos || 'top 85%',
+        end: CONFIG.startPinPos || 'top top',
+        scrub: 0.5,
+        pin: false,
+        invalidateOnRefresh: true,
+        onUpdate: renderOrbit
       }
     });
 
-    window.cohesiveAnimState = { tl: tl };
+    // PHASE 2: Main pinned phase animation (pins section when aligned at screen top)
+    var mainTl = gsap.fromTo(proxy,
+      { progress: entryProgressMax },
+      {
+        progress: CONFIG.totalProgress,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: CONFIG.startPinPos || 'top top',
+          end: pinDistance,
+          scrub: 1,
+          pin: true,
+          pinSpacing: true,
+          invalidateOnRefresh: true,
+          onUpdate: renderOrbit
+        }
+      }
+    );
+
+    window.cohesiveAnimState = { entryTl: entryTl, mainTl: mainTl };
   }
 
   function startWhenReady() {
