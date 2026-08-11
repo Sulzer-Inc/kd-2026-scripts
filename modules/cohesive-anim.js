@@ -1,18 +1,33 @@
 // ============================================================================
-// 3. COHESIVE PILLS ORBIT
+// 3. COHESIVE PILLS ORBIT - Used on Homepage V2 2026 
 // ============================================================================
 (function () {
   gsap.registerPlugin(ScrollTrigger);
 
   var CONFIG = {
-    totalProgress: 0.4,
-    pinDistance: '+=1500',
-    pinDistanceMobile: '+=900',
-    mobileBreakpoint: 1200,
-    minWrapperHeight: 560,
-    scaleStart: 0.6,
-    scaleEnd: 1.0,
-    scaleFinishAt: 0.8
+    mobileBreakpoint: 1200,      // Breakpoint (px) e.g. 1200 (desktop active >= 1200px)
+    pinDistance: '+=1500',       // Desktop pin distance e.g. '+=1000' to '+=2500'
+    pinDistanceMobile: '+=900',  // Mobile pin distance e.g. '+=600' to '+=1200'
+    minWrapperHeight: 560,       // Container min-height (px) e.g. 400 to 700
+    totalProgress: 0.4,          // Orbit rotation distance e.g. 0.2 to 0.8 (0.4 = 40% loop)
+    scaleStart: 0.4,             // Card start scale e.g. 0.3 to 0.8
+    scaleEnd: 1.0,               // Card end scale e.g. 1.0
+    scaleFinishAt: 0.8,          // Scale finish progress ratio e.g. 0.5 to 1.0
+
+    // Pseudo-image (.cohesive-k12__pseudo-img) start offset, scale & opacity options
+    pseudoImage: {
+      enabled: true,             // Enable pseudo-image animation (true/false)
+      scaleStart: 0.4,           // Image start scale e.g. 0.2 to 0.8
+      opacityStart: 1,         // Image start opacity e.g. 0.0 to 0.5
+
+      // Start offsets (px) relative to native Webflow layout position (progress = 0)
+      startOffsets: {
+        top:    { x: -40, y: 30 },  // Top image start offset (px) e.g. x: -100..100, y: -100..100
+        left:   { x: -50, y: -20 }, // Left image start offset (px) e.g. x: -100..100, y: -100..100
+        bottom: { x: 30,  y: 40 },  // Bottom image start offset (px) e.g. x: -100..100, y: -100..100
+        right:  { x: 40,  y: -20 }  // Right image start offset (px) e.g. x: -100..100, y: -100..100
+      }
+    }
   };
 
   function power4Out(t) {
@@ -62,10 +77,38 @@
     return 0;
   }
 
-  function applyItemTransform(item, pos, itemScale) {
+  function getItemKey(item) {
+    if (item.classList.contains('cohesive-k12__item--right')) return 'right';
+    if (item.classList.contains('cohesive-k12__item--bottom')) return 'bottom';
+    if (item.classList.contains('cohesive-k12__item--left')) return 'left';
+    return 'top';
+  }
+
+  function applyItemTransform(item, pos, itemScale, scaleEased) {
     item.style.left = pos.x + 'px';
     item.style.top = pos.y + 'px';
     item.style.transform = 'translate(-50%, -50%) scale(' + itemScale.toFixed(3) + ')';
+
+    if (CONFIG.pseudoImage && CONFIG.pseudoImage.enabled) {
+      var pseudoImg = item.querySelector('.cohesive-k12__pseudo-img, .img-top, .img-left, .img-bottom, .img-right');
+      if (pseudoImg) {
+        var key = getItemKey(item);
+        var offsets = (CONFIG.pseudoImage.startOffsets && CONFIG.pseudoImage.startOffsets[key]) || { x: 0, y: 0 };
+
+        var imgX = offsets.x * (1 - scaleEased);
+        var imgY = offsets.y * (1 - scaleEased);
+
+        var startScale = CONFIG.pseudoImage.scaleStart !== undefined ? CONFIG.pseudoImage.scaleStart : 0.5;
+        var startOpacity = CONFIG.pseudoImage.opacityStart !== undefined ? CONFIG.pseudoImage.opacityStart : 0.3;
+
+        var imgScale = startScale + (1.0 - startScale) * scaleEased;
+        var imgOpacity = startOpacity + (1.0 - startOpacity) * scaleEased;
+
+        pseudoImg.style.transform = 'translate(' + imgX.toFixed(2) + 'px, ' + imgY.toFixed(2) + 'px) scale(' + imgScale.toFixed(3) + ')';
+        pseudoImg.style.opacity = imgOpacity.toFixed(3);
+        pseudoImg.style.willChange = 'transform, opacity';
+      }
+    }
   }
 
   function initCohesiveAnimation() {
@@ -79,6 +122,7 @@
     if (items.length === 0) return;
 
     var heading = wrapper.querySelector('.cohesive-k12__heading');
+    var pseudoImgs = wrapper.querySelectorAll('.cohesive-k12__pseudo-img, .img-top, .img-left, .img-bottom, .img-right');
 
     if (window.cohesiveAnimState) {
       var prev = window.cohesiveAnimState;
@@ -86,6 +130,7 @@
       if (prev.tl) prev.tl.kill();
       gsap.set(items, { clearProps: 'position,left,top,transform,opacity,width,maxWidth,zIndex,pointerEvents' });
       if (heading) gsap.set(heading, { clearProps: 'position,left,top,transform,zIndex' });
+      if (pseudoImgs.length > 0) gsap.set(pseudoImgs, { clearProps: 'transform,opacity,willChange' });
     }
 
     if (window.innerWidth < CONFIG.mobileBreakpoint) {
@@ -127,7 +172,7 @@
       });
       var startP = getItemStartProgress(item);
       var pos = getPillPosition(startP - CONFIG.totalProgress, w, h);
-      applyItemTransform(item, pos, CONFIG.scaleStart);
+      applyItemTransform(item, pos, CONFIG.scaleStart, 0);
     });
 
     var proxy = { progress: 0 };
@@ -164,7 +209,7 @@
           var startP = getItemStartProgress(item);
           var currentP = startP - CONFIG.totalProgress + proxy.progress;
           var pos = getPillPosition(currentP, cw, ch);
-          applyItemTransform(item, pos, itemScale);
+          applyItemTransform(item, pos, itemScale, scaleEased);
         }
       }
     });

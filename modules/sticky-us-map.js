@@ -1,5 +1,5 @@
 // ============================================================================
-// STICKY US MAP ANIMATION (Lassie.ai style)
+// STICKY US MAP ANIMATION
 // ============================================================================
 (function () {
   // Ensure GSAP is loaded
