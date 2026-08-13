@@ -5,6 +5,7 @@
 
 // Global
 require('./modules/vimeo-global.js');
+require('./modules/splide-sliders.js');
 
 // Used in Homepage
 require('./modules/svg-path-animator.js');
