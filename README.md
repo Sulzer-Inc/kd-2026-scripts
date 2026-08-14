@@ -1,11 +1,11 @@
-# Kiddom Webflow Scripts
+# Kiddom Webflow Scripts & Styles
 
-This repository contains the custom JavaScript modules used on the Kiddom Webflow site. 
-Because Webflow does not natively support hosting complex, multi-file JavaScript projects or ES modules, we develop the code here and serve it to Webflow using a CDN.
+This repository contains the custom JavaScript modules and SCSS styles used on the Kiddom Webflow site. 
+Because Webflow does not natively support hosting complex, multi-file JavaScript/SCSS projects, we develop the code here and serve it to Webflow using a CDN.
 
 ## Local Development
 
-We use Gulp and Webpack to bundle the scripts and inject them into a local proxy of the staging site.
+We use Gulp, Dart Sass, PostCSS, and Webpack to compile styles and bundle scripts, injecting them into a local proxy of the staging site.
 
 ### 1. Installation
 Make sure you have Node.js installed, then install the dependencies:
@@ -17,7 +17,9 @@ npm install
 ```bash
 gulp watch
 ```
-This will start a local proxy (using BrowserSync) of `https://kiddom-staging.webflow.io/`. Any changes you make to the local JavaScript files (`kiddom-scripts.js` or files in `/modules/`) will automatically be bundled by Webpack into `dist/js/kiddom-scripts-bundled.js` and injected into the proxied page on-the-fly.
+This will start a local proxy (using BrowserSync) of `https://kiddom-staging.webflow.io/`:
+* **JavaScript**: Changes to `src/js/` (entry `src/js/kiddom-scripts.js` and `src/js/modules/`) are bundled into `dist/js/kiddom-scripts-bundled.js` and hot-reloaded.
+* **SCSS/CSS**: Changes to `src/sass/` (entry `src/sass/kiddom-styles.scss` and partials) are compiled into `dist/css/kiddom-styles.min.css` and live-streamed without full page reloads.
 
 ---
 
@@ -25,12 +27,13 @@ This will start a local proxy (using BrowserSync) of `https://kiddom-staging.web
 
 When you are ready to deploy your changes, simply commit and push your code to the `main` branch on GitHub.
 
-The scripts are served to Webflow via CDNs, which aggressively cache files to improve performance. This means you might not see your changes immediately on the live site.
+The assets are served to Webflow via CDNs, which aggressively cache files to improve performance. This means you might not see your changes immediately on the live site.
 
 ### jsDelivr Cache Purge Links
-Clicking this link will manually purge the jsDelivr cache and force it to fetch the latest version from GitHub. It will return a JSON response indicating whether the purge was successful (`"purged": true`).
+Clicking these links will manually purge the jsDelivr cache and force it to fetch the latest version from GitHub. It will return a JSON response indicating whether the purge was successful (`"purged": true`).
 
-* **<a href="https://purge.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js" target="_blank">Purge Bundled Script</a>**
+* **<a href="https://purge.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js" target="_blank">Purge Bundled JavaScript</a>**
+* **<a href="https://purge.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/css/kiddom-styles.min.css" target="_blank">Purge Compiled CSS</a>**
 
 > [!NOTE]
 > **Rate Limiting / Throttling:** When a file path on `@main` is purged multiple times in a short window, jsDelivr rate-limits / throttles purge requests to protect its edge servers. If the JSON response shows `"throttled": true`, the API will ignore new purge attempts until the cooldown timer (`throttlingReset` ~8 minutes) expires.
@@ -41,9 +44,32 @@ Clicking this link will manually purge the jsDelivr cache and force it to fetch 
 
 ---
 
-## Webflow Script Injection Snippet
+## Webflow Code Snippets
 
-If you need to re-add or reference the script injection code used in Webflow, here it is. **This should be pasted into the "Before `</body>` tag" section in Webflow's Custom Code settings.** This automatically serves the jsDelivr version on production (`kiddom.co`) and the Githack version on staging or the Webflow designer.
+### 1. Styles (`<head>` Code)
+Paste this into the **"Inside `<head>` tag"** section in Webflow's Custom Code settings:
+
+```html
+<!-- Consolidated Kiddom Styles -->
+<script>
+(function() {
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
+  if (window.location.hostname.indexOf('kiddom.co') !== -1) {
+    // Production (jsDelivr CDN)
+    link.href = 'https://cdn.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/css/kiddom-styles.min.css';
+  } else {
+    // Staging, Localhost, Designer Preview, etc. (GitHack)
+    link.href = 'https://raw.githack.com/Sulzer-Inc/kd-2026-scripts/main/dist/css/kiddom-styles.min.css';
+  }
+  document.head.appendChild(link);
+})();
+</script>
+```
+
+### 2. Scripts (Before `</body>` Code)
+Paste this into the **"Before `</body>` tag"** section in Webflow's Custom Code settings:
 
 ```html
 <!-- Consolidated Kiddom Scripts -->
@@ -51,10 +77,10 @@ If you need to re-add or reference the script injection code used in Webflow, he
 (function() {
   var script = document.createElement('script');
   if (window.location.hostname.indexOf('kiddom.co') !== -1) {
-    // Production
+    // Production (jsDelivr CDN)
     script.src = 'https://cdn.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js';
   } else {
-    // Staging, Localhost, Designer Preview, etc.
+    // Staging, Localhost, Designer Preview, etc. (GitHack)
     script.src = 'https://raw.githack.com/Sulzer-Inc/kd-2026-scripts/main/dist/js/kiddom-scripts-bundled.js';
   }
   document.body.appendChild(script);
