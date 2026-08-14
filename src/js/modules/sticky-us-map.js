@@ -10,7 +10,7 @@
     scrollDistanceVh: 2,   // Total scroll length of pin
     cardScrollDuration: 1,   // Time each card takes to travel from bottom to top
     gapVh: 70,               // Vertical gap between card centers in vh
-    mobileBreakpoint: 767,
+    mobileBreakpoint: 557,
   };
 
   function init() {
