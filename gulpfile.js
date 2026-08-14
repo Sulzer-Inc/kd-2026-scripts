@@ -16,32 +16,35 @@ const postcss = require('gulp-postcss');
 const rename = require('gulp-rename');
 const webpack = require('webpack-stream');
 
-// var styleSRC     = '../src/sass/*.scss';     // entry points only — compiled by gulp
-// var styleWatch   = '../src/sass/**/*.scss';  // all SCSS including partials — watched for changes
-// var styleDIST    = '../css/';
+var styleSRC     = './src/sass/*.scss';     // entry points only — compiled by gulp
+var styleWatch   = './src/sass/**/*.scss';  // all SCSS including partials — watched for changes
+var styleDIST    = './dist/css/';
 
-var scriptSRC   = './kiddom-scripts.js';     // entry point only — webpack resolves imports
-var scriptWatch = ['./kiddom-scripts.js', './modules/**/*.js'];  // all JS including modules — watched for changes
+var scriptSRC   = './src/js/kiddom-scripts.js';     // entry point only — webpack resolves imports
+var scriptWatch = ['./src/js/kiddom-scripts.js', './src/js/modules/**/*.js'];  // all JS including modules — watched for changes
 var scriptDIST  = './dist/js/';
 
-// function compileCss() {
-//     // Minified CSS
-//     return gulp.src(styleSRC)
-//         .pipe(sourcemaps.init())
-//         .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
-//         .pipe(postcss([
-//             autoprefixer({
-//                 overrideBrowserslist: ['> 1%', 'last 2 versions', 'IE 11'],
-//                 cascade: false
-//             }),
-//             cssnano()
-//         ]))
-//         .pipe(rename({ suffix: '.min' }))
-//         .pipe(sourcemaps.write('.'))
-//         .pipe(gulp.dest(styleDIST))
-//         .pipe(browserSync.stream())
-//         .pipe(notify({ message: 'Minified CSS compiled', onLast: true }));
-// }
+function compileCss() {
+    // Minified CSS
+    return gulp.src(styleSRC)
+        .pipe(sourcemaps.init())
+        .pipe(sass({ 
+            outputStyle: 'compressed',
+            includePaths: ['node_modules']
+        }).on('error', sass.logError))
+        .pipe(postcss([
+            autoprefixer({
+                overrideBrowserslist: ['> 1%', 'last 2 versions', 'IE 11'],
+                cascade: false
+            }),
+            cssnano()
+        ]))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(styleDIST))
+        .pipe(browserSync.stream())
+        .pipe(notify({ message: 'Minified CSS compiled', onLast: true }));
+}
 
 // compile bundled js
 function jspack() {
@@ -60,17 +63,23 @@ function watch() {
         serveStatic: ['.'], // Serve local files
         rewriteRules: [
             {
-                // Match raw.githack.com script URL (either unbundled or bundled) and point to local copy
-                match: /https:\/\/raw\.githack\.com\/Sulzer-Inc\/kd-2026-scripts\/main\/(kiddom-2026-scripts\.js|dist\/js\/kiddom-scripts-bundled\.js)/g,
+                // Match JS (githack or jsdelivr CDN) and point to local copy
+                match: /https:\/\/(raw\.githack\.com\/Sulzer-Inc\/kd-2026-scripts\/main|cdn\.jsdelivr\.net\/gh\/Sulzer-Inc\/kd-2026-scripts@main)\/(kiddom-2026-scripts\.js|dist\/js\/kiddom-scripts-bundled\.js)/g,
                 replace: '/dist/js/kiddom-scripts-bundled.js'
+            },
+            {
+                // Match CSS (githack or jsdelivr CDN) and point to local copy
+                match: /https:\/\/(raw\.githack\.com\/Sulzer-Inc\/kd-2026-scripts\/main|cdn\.jsdelivr\.net\/gh\/Sulzer-Inc\/kd-2026-scripts@main)\/dist\/css\/kiddom-styles(\.min)?\.css/g,
+                replace: '/dist/css/kiddom-styles.min.css'
             }
         ]
     });
-    // gulp.watch(styleWatch, compileCss);
+    gulp.watch(styleWatch, compileCss);
     gulp.watch(scriptWatch, jspack);
     gulp.watch(scriptWatch).on('change', browserSync.reload);
 }
 
 exports.watch = watch;
-// exports.compileCss = compileCss;
+exports.compileCss = compileCss;
 exports.jspack = jspack;
+exports.default = gulp.series(gulp.parallel(compileCss, jspack), watch);
