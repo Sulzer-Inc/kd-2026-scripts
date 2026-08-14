@@ -7,7 +7,7 @@
   }
 
   var CONFIG = {
-    mobileBreakpoint: 769,       // Breakpoint (px) (desktop active >= 768px)
+    mobileBreakpoint: 1024,       // Breakpoint (px) (desktop active >= 768px)
     startEntryPos: 'top 85%',    // Entry position: start rotation as soon as section enters viewport
     startPinPos: 'top 50px',    // Pin position: pin section 100px below top of viewport for header clearance
     entryProgressFraction: 0.15, // Orbit progress completed during unpinned entry phase (15%)
