@@ -70,10 +70,10 @@ function initColsSliders() {
             const prev = slider.querySelector('.splide__arrow--prev');
             const next = slider.querySelector('.splide__arrow--next');
             if (prev) {
-                prev.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D3748" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+                prev.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2D3748" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
             }
             if (next) {
-                next.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D3748" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+                next.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2D3748" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
             }
         });
 

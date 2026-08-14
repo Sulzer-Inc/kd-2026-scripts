@@ -12,6 +12,7 @@
 .splide--cols {
   position: relative;
   width: 100%;
+  gap: 0!important;
 
   .splide__track {
     overflow: hidden;
@@ -54,11 +55,11 @@
     cursor: pointer;
     z-index: 10;
     padding: 0;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.4s ease;
 
     svg {
-      width: 20px;
-      height: 20px;
+      width: 40px;
+      height: 40px;
       fill: none !important;
       stroke: #2D3748;
       stroke-width: 2.2;
@@ -79,19 +80,19 @@
 
     &--prev {
       left: 0;
-      transform: translate(-50%, -50%);
+      transform: translate(-150%, -50%);
 
       &:hover:not(:disabled) {
-        transform: translate(-50%, -50%) scale(1.05);
+        transform: translate(-150%, -50%) scale(1.25);
       }
     }
 
     &--next {
       right: 0;
-      transform: translate(50%, -50%);
+      transform: translate(150%, -50%);
 
       &:hover:not(:disabled) {
-        transform: translate(50%, -50%) scale(1.05);
+        transform: translate(150%, -50%) scale(1.225);
       }
 
       svg {
@@ -114,7 +115,7 @@
         left: 0;
         transform: translate(-30%, -50%);
         &:hover:not(:disabled) {
-          transform: translate(-30%, -50%) scale(1.05);
+          transform: translate(-30%, -50%) scale(1.25);
         }
       }
 
@@ -122,7 +123,7 @@
         right: 0;
         transform: translate(30%, -50%);
         &:hover:not(:disabled) {
-          transform: translate(30%, -50%) scale(1.05);
+          transform: translate(30%, -50%) scale(1.25);
         }
       }
     }
