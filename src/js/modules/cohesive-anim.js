@@ -13,17 +13,17 @@
     entryProgressFraction: 0.15, // Orbit progress completed during unpinned entry phase (15%)
     pinDistance: '+=1500',       // Desktop pin distance e.g. '+=1000' to '+=2500'
     pinDistanceMobile: '+=900',  // Mobile pin distance e.g. '+=600' to '+=1200'
-    minWrapperHeight: 560,       // Container min-height (px) e.g. 400 to 700
-    totalProgress: 0.4,          // Orbit rotation distance e.g. 0.2 to 0.8 (0.4 = 40% loop)
+    minWrapperHeight: 460,       // Container min-height (px) e.g. 400 to 700
+    totalProgress: 0.2,          // Orbit rotation distance e.g. 0.2 to 0.8 (0.4 = 40% loop)
     easePower: 3,                // Ease-out deceleration near ending e.g. 1 (linear), 2 (quad), 3 (cubic/Lassie style), 4 (quart)
     scaleStart: 0.4,             // Card start scale e.g. 0.3 to 0.8
     scaleEnd: 1.0,               // Card end scale e.g. 1.0
-    scaleFinishAt: 0.8,          // Scale finish progress ratio e.g. 0.5 to 1.0
+    scaleFinishAt: 1.0,          // Scale finish progress ratio e.g. 0.5 to 1.0
 
     // Pseudo-image (.cohesive-k12__pseudo-img) start offset, scale & opacity options
     pseudoImage: {
       enabled: true,             // Enable pseudo-image animation (true/false)
-      scaleStart: 0.4,           // Image start scale e.g. 0.2 to 0.8
+      scaleStart: 0.8,           // Image start scale e.g. 0.2 to 0.8
       opacityStart: 0.3,         // Image start opacity e.g. 0.0 to 1.0
 
       // Start offsets (px) relative to native Webflow layout position (progress = 0)
