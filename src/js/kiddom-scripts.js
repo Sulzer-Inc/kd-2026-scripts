@@ -13,6 +13,7 @@ require('./modules/cohesive-anim.js');
 require('./modules/product-parallax.js');
 require('./modules/hero-2026-sticky.js');
 require('./modules/sticky-us-map.js');
+require('./modules/splide-cols-slider.js');
 
 // Atlas page
 require('./modules/circular-video-orbit-rotator.js');
