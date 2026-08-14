@@ -102,7 +102,7 @@
     var cardScrollDuration = CONFIG.cardScrollDuration;
     var velocity = 200 / cardScrollDuration; // 200vh / duration
     var staggerTime = CONFIG.gapVh / velocity; // seconds between card centers
-    var introDuration = 1.0;
+    var introDuration = 0.3;
 
     // Calculate total timeline duration dynamically in advance
     var totalTimelineDuration = introDuration;
