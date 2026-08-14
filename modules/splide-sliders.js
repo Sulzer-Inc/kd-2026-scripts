@@ -45,7 +45,7 @@ function initLogoCarousels() {
                 autoHeight: true,
                 arrows: false,
                 pagination: false,
-                gap: '4rem',
+                gap: '2rem',
                 autoScroll: {
                     speed: .5, 
                     pauseOnHover: true,
