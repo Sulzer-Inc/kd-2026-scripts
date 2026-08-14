@@ -7,8 +7,8 @@
   gsap.registerPlugin(ScrollTrigger);
 
   var CONFIG = {
-    scrollDistanceVh: 3,   // Total scroll length of pin
-    cardScrollDuration: 2,   // Time each card takes to travel from bottom to top
+    scrollDistanceVh: 2,   // Total scroll length of pin
+    cardScrollDuration: 1,   // Time each card takes to travel from bottom to top
     gapVh: 70,               // Vertical gap between card centers in vh
     mobileBreakpoint: 767,
   };
@@ -147,8 +147,13 @@
       0
     );
     tl.fromTo(mapImg, 
-      { y: 350, opacity: 0.4 }, 
-      { y: 0, opacity: 1, duration: introDuration, ease: 'power1.out' }, 
+      { y: 350 }, 
+      { y: 0, duration: introDuration, ease: 'power1.out' }, 
+      0
+    );
+    tl.fromTo(mapImg, 
+      { opacity: 0.2 }, 
+      { opacity: 1, duration: totalTimelineDuration, ease: 'none' }, 
       0
     );
 
