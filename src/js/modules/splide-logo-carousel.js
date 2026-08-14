@@ -2,6 +2,9 @@
 // Splide.js Sliders Initialization
 // =============================================================================
 
+import Splide from '@splidejs/splide';
+import { AutoScroll } from '@splidejs/splide-extension-auto-scroll';
+
 function initLogoCarousels() {
     if (window.splideInitialized) return;
     window.splideInitialized = true;

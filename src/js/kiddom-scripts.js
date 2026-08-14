@@ -3,9 +3,6 @@
 // Bundles to: js/kiddom-scripts-bundled.js
 // =============================================================================
 
-import Splide from '@splidejs/splide';
-import { AutoScroll } from '@splidejs/splide-extension-auto-scroll';
-
 // Global
 require('./modules/vimeo-global.js');
 require('./modules/splide-logo-carousel.js');
