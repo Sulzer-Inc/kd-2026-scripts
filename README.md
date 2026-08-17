@@ -38,13 +38,14 @@ Clicking these links will manually purge the jsDelivr cache and force it to fetc
 > [!NOTE]
 > **Rate Limiting / Throttling:** When a file path on `@main` is purged multiple times in a short window, jsDelivr rate-limits / throttles purge requests to protect its edge servers. If the JSON response shows `"throttled": true`, the API will ignore new purge attempts until the cooldown timer (`throttlingReset` ~8 minutes) expires.
 
-### Githack
-* **`raw.githack.com` (Development):** The cache automatically expires every **1 minute**. You do not need to manually purge it; just wait 60 seconds after your push.
-* **`rawcdn.githack.com` (Production):** The cache is set to expire after **1 year**. It cannot be easily purged. If you are using this in production, you should use jsDelivr instead, or you will need to append a query parameter or change the filename in Webflow to bust the cache.
+### GitHub Pages (Staging)
+* **`sulzer-inc.github.io` (Staging):** We use GitHub Pages to serve files for staging because it updates instantly when code is pushed to `main` and has no aggressive caching or rate-limiting.
 
 ---
 
 ## Webflow Code Snippets
+
+We use a small script to automatically load the fast GitHub Pages links on staging (`webflow.io`) and the cached jsDelivr links on production (`kiddom.co`).
 
 ### 1. Styles (`<head>` Code)
 Paste this into the **"Inside `<head>` tag"** section in Webflow's Custom Code settings:
@@ -56,12 +57,12 @@ Paste this into the **"Inside `<head>` tag"** section in Webflow's Custom Code s
   var link = document.createElement('link');
   link.rel = 'stylesheet';
   link.type = 'text/css';
-  if (window.location.hostname.indexOf('kiddom.co') !== -1) {
+  if (window.location.hostname.indexOf('webflow.io') !== -1) {
+    // Staging, Localhost, Designer Preview, etc. (GitHub Pages)
+    link.href = 'https://sulzer-inc.github.io/kd-2026-scripts/dist/css/kiddom-styles.min.css';
+  } else {
     // Production (jsDelivr CDN)
     link.href = 'https://cdn.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/css/kiddom-styles.min.css';
-  } else {
-    // Staging, Localhost, Designer Preview, etc. (GitHack)
-    link.href = 'https://raw.githack.com/Sulzer-Inc/kd-2026-scripts/main/dist/css/kiddom-styles.min.css';
   }
   document.head.appendChild(link);
 })();
@@ -76,12 +77,13 @@ Paste this into the **"Before `</body>` tag"** section in Webflow's Custom Code 
 <script>
 (function() {
   var script = document.createElement('script');
-  if (window.location.hostname.indexOf('kiddom.co') !== -1) {
+  script.defer = true;
+  if (window.location.hostname.indexOf('webflow.io') !== -1) {
+    // Staging, Localhost, Designer Preview, etc. (GitHub Pages)
+    script.src = 'https://sulzer-inc.github.io/kd-2026-scripts/dist/js/kiddom-scripts-bundled.js';
+  } else {
     // Production (jsDelivr CDN)
     script.src = 'https://cdn.jsdelivr.net/gh/Sulzer-Inc/kd-2026-scripts@main/dist/js/kiddom-scripts-bundled.js';
-  } else {
-    // Staging, Localhost, Designer Preview, etc. (GitHack)
-    script.src = 'https://raw.githack.com/Sulzer-Inc/kd-2026-scripts/main/dist/js/kiddom-scripts-bundled.js';
   }
   document.body.appendChild(script);
 })();
