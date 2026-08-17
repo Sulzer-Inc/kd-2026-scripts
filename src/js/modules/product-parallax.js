@@ -210,12 +210,53 @@
     ScrollTrigger.refresh();
   }
 
-  if (document.readyState === 'complete' || document.readyState === 'interactive') init();
-  else window.addEventListener('load', init);
+  function startWhenReady() {
+    var section = document.querySelector('.product-parallax');
+    if (!section) return;
+
+    var imgs = section.querySelectorAll('img');
+    var pending = [];
+    for (var i = 0; i < imgs.length; i++) {
+      if (!imgs[i].complete) pending.push(imgs[i]);
+    }
+
+    var hasRun = false;
+    var timerId = null;
+
+    var run = function () {
+      if (hasRun) return;
+      hasRun = true;
+      if (timerId) clearTimeout(timerId);
+      init();
+    };
+
+    if (pending.length === 0) {
+      run();
+      return;
+    }
+
+    var remaining = pending.length;
+    var done = function () {
+      remaining--;
+      if (remaining <= 0) run();
+    };
+    pending.forEach(function (img) {
+      img.addEventListener('load', done);
+      img.addEventListener('error', done);
+    });
+    // Fallback if load events fail
+    timerId = setTimeout(run, 2000);
+  }
+
+  if (document.readyState === 'complete') {
+    setTimeout(startWhenReady, 100);
+  } else {
+    window.addEventListener('load', startWhenReady);
+  }
 
   var resizeTimeout;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(init, 250);
+    resizeTimeout = setTimeout(startWhenReady, 250);
   });
 })();
