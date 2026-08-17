@@ -126,6 +126,13 @@
       } else {
         txt.style.maxWidth = ''; // clear any desktop inline width
         gsap.set(txt, { clearProps: 'maxWidth,position,top,yPercent,x' });
+        gsap.set(txt, { position: 'relative', top: 0, left: 0, right: 'auto', bottom: 'auto' });
+        
+        var img = item.querySelector('.product-parallax__item-content');
+        if (img) {
+          gsap.set(img, { clearProps: 'position' });
+          gsap.set(img, { position: 'relative', top: 0, left: 0, right: 'auto', bottom: 'auto' });
+        }
       }
     });
 
