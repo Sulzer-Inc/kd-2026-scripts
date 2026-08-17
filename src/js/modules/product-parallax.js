@@ -118,8 +118,8 @@
       var img = item.querySelector('.product-parallax__item-content');
       var txt = item.querySelector('.product-parallax__item-txt');
 
-      if (img) gsap.set(img, { scale: state.scale, y: state.y });
-      if (txt) gsap.set(txt, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30 });
+      if (img) gsap.set(img, { scale: state.scale, y: state.y, zIndex: 1, force3D: true });
+      if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: true });
     });
 
     var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 40;
@@ -133,14 +133,14 @@
       
       if (!isMobile) {
         txt.style.maxWidth = textMaxWidth + 'px';
-        gsap.set(txt, { x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX, y: 30, opacity: 0 });
+        gsap.set(txt, { x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX, y: 30, autoAlpha: 0 });
       } else {
         txt.style.maxWidth = '100%';
-        gsap.set(txt, { x: 0, y: 30, opacity: 0 });
+        gsap.set(txt, { x: 0, y: 30, autoAlpha: 0 });
       }
     });
     
-    gsap.set(items[0].querySelector('.product-parallax__item-txt'), { opacity: 1, y: 0 });
+    gsap.set(items[0].querySelector('.product-parallax__item-txt'), { autoAlpha: 1, y: 0 });
 
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
@@ -191,7 +191,7 @@
 
       if (prevTxt) {
         tl.to(prevTxt, { y: window.innerWidth >= 1280 ? '-60%' : -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
-        tl.to(prevTxt, { opacity: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i);
+        tl.to(prevTxt, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i);
       }
       if (prevImg) tl.to(prevImg, { y: -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
       
@@ -199,7 +199,7 @@
       
       if (currTxt) {
         tl.fromTo(currTxt, { y: 30 }, { y: 0, duration: CONFIG.stepDuration }, 'step-' + i + '+=' + CONFIG.txtOffset);
-        tl.fromTo(currTxt, { opacity: 0 }, { opacity: 1, duration: CONFIG.stepDuration * 0.45 }, 'step-' + i + '+=' + CONFIG.txtOffset);
+        tl.fromTo(currTxt, { autoAlpha: 0 }, { autoAlpha: 1, duration: CONFIG.stepDuration * 0.45 }, 'step-' + i + '+=' + CONFIG.txtOffset);
       }
     });
 

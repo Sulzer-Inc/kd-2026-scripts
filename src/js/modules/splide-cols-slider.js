@@ -43,13 +43,15 @@ function initColsSliders() {
             slides.forEach(slide => slide.classList.add('splide__slide'));
         }
 
+        const hasNoArrows = slider.classList.contains('no-arrows');
+
         // 4. Initialize Splide instance
         const splideInstance = new Splide(slider, {
             type: 'loop',
             perPage: 3,
             perMove: 1,
             autoplay: false,
-            arrows: true,
+            arrows: !hasNoArrows,
             pagination: false,
             gap: '1.5rem',
             speed: 500,
