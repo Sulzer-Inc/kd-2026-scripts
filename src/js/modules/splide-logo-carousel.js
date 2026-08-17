@@ -52,9 +52,9 @@ function initLogoCarousels() {
                     pauseOnFocus: false,
                 },
                 breakpoints: {
-                    991: { gap: '3rem' },
-                    767: { gap: '2rem' },
-                    479: { gap: '1.5rem' }
+                    991: { gap: '3rem', pagination: true },
+                    767: { gap: '2rem', pagination: true },
+                    479: { gap: '1.5rem', pagination: true }
                 }
             }).mount({ AutoScroll });
         });
