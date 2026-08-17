@@ -130,27 +130,32 @@
   }
 }
 
-.splide-logo-carousel {
+ul.splide__pagination {
+  button.splide__pagination__page {
+    margin-inline: .35rem;
+    background-color: transparent;
+    border: .5px solid #3F4C4C;
+    width: .75rem;
+    height: .75rem;
+    
+    &.is-active {
+      background: #3F4C4C;
+      transform: none;
+    }
+  }
+}
 
+.splide-logo-carousel {
   .splide__track {
     padding-bottom: 3.75rem;
 
   }
-  
-  ul.splide__pagination {
-
-    button.splide__pagination__page {
-      margin-inline: .35rem;
-      background-color: transparent;
-      border: .5px solid #3F4C4C;
-      width: .75rem;
-      height: .75rem;
-      
-      &.is-active {
-        background: #3F4C4C;
-        transform: none;
-      }
-    }
-  }
-
 }
+
+.splide-cols-slider {
+  .splide__track {
+    padding-bottom: 3.75rem;
+
+  }
+}
+

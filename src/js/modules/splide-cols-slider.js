@@ -59,10 +59,12 @@ function initColsSliders() {
                 991: {
                     perPage: 2,
                     gap: '1.25rem',
+                    pagination: true,
                 },
                 767: {
                     perPage: 1,
                     gap: '1rem',
+                    pagination: true,
                 }
             }
         });
