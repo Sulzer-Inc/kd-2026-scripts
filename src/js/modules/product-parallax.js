@@ -119,7 +119,7 @@
     var cardHeight = items[0].offsetHeight;
     gsap.set(section, { position: 'relative', height: cardHeight + 'px', width: '100%' });
 
-    var itemMaxWidth = isMobile ? '100%' : (window.innerWidth < 1100 ? '50%' : '70%');
+    var itemMaxWidth = isMobile ? '100%' : (window.innerWidth < 1440 ? '65%' : '70%');
 
     items.forEach(function (item, i) {
       gsap.set(item, {
@@ -136,7 +136,7 @@
       if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: true });
     });
 
-    var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 40;
+    var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 80;
     var textMaxWidth = Math.max(120, Math.min(257, availableTextSpace));
     var leftX = -(textMaxWidth + 32);
     var rightX = textMaxWidth + 32;
