@@ -11,6 +11,16 @@
     cardScrollDuration: 1,   // Time each card takes to travel from bottom to top
     gapVh: 70,               // Vertical gap between card centers in vh
     mobileBreakpoint: 557,
+    // Mobile Stack Animation
+    mobileAnim: {
+      enabled: true,
+      startOffset: 'top 85%',
+      yOffset: 50,
+      duration: 0.8,
+      ease: 'power3.out',
+      delayStart: 0.3,
+      delayStep: 0.1
+    }
   };
 
   function init() {
@@ -37,7 +47,25 @@
     var isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
 
     if (isMobile) {
-      // On mobile, keep default layout and do not run the pin animation
+      if (CONFIG.mobileAnim && CONFIG.mobileAnim.enabled) {
+        window.stickyUsMapTl = gsap.fromTo(items,
+          { opacity: 0, y: CONFIG.mobileAnim.yOffset },
+          {
+            opacity: 1,
+            y: 0,
+            duration: CONFIG.mobileAnim.duration,
+            ease: CONFIG.mobileAnim.ease,
+            stagger: function(index) {
+              return CONFIG.mobileAnim.delayStart + (index * CONFIG.mobileAnim.delayStep);
+            },
+            scrollTrigger: {
+              trigger: scrollContent,
+              start: CONFIG.mobileAnim.startOffset,
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+      }
       return;
     }
 
