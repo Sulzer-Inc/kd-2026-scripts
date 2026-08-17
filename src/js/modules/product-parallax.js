@@ -102,29 +102,39 @@
     var isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
     if (items.length < 2) return;
 
-    // Normalize text heights so all cards have their video perfectly aligned vertically
-    var maxTxtHeight = 0;
+    var itemMaxWidth = isMobile ? '100%' : (window.innerWidth < 1440 ? '65%' : '70%');
+
+    var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 80;
+    var textMaxWidth = Math.max(120, Math.min(257, availableTextSpace));
+    var leftX = -(textMaxWidth + 32);
+    var rightX = textMaxWidth + 32;
+
     items.forEach(function (item) {
       var txt = item.querySelector('.product-parallax__item-txt');
-      if (txt) {
-        txt.style.minHeight = '0px';
-        if (txt.offsetHeight > maxTxtHeight) maxTxtHeight = txt.offsetHeight;
+      if (!txt) return;
+      txt.style.minHeight = '0px'; // clear any previous min-height
+      
+      if (!isMobile) {
+        txt.style.maxWidth = textMaxWidth + 'px';
+        gsap.set(txt, { position: 'absolute', top: '50%', yPercent: -50, x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX });
+      } else {
+        txt.style.maxWidth = '90%';
+        gsap.set(txt, { position: 'relative', top: 'auto', yPercent: 0, x: 0 });
       }
     });
-    items.forEach(function (item) {
-      var txt = item.querySelector('.product-parallax__item-txt');
-      if (txt) txt.style.minHeight = maxTxtHeight + 'px';
+
+    var maxItemHeight = 0;
+    items.forEach(function(item) {
+      if (item.offsetHeight > maxItemHeight) maxItemHeight = item.offsetHeight;
     });
 
-    var cardHeight = items[0].offsetHeight;
+    var cardHeight = maxItemHeight;
     gsap.set(section, { position: 'relative', height: cardHeight + 'px', width: '100%' });
-
-    var itemMaxWidth = isMobile ? '100%' : (window.innerWidth < 1440 ? '65%' : '70%');
 
     items.forEach(function (item, i) {
       gsap.set(item, {
-        position: 'absolute', top: '50%', left: '50%',
-        xPercent: -50, yPercent: -50, width: '100%', maxWidth: itemMaxWidth,
+        position: 'absolute', bottom: '0', top: 'auto', left: '50%',
+        xPercent: -50, yPercent: 0, width: '100%', maxWidth: itemMaxWidth,
         zIndex: items.length - i
       });
 
@@ -135,26 +145,6 @@
       if (img) gsap.set(img, { scale: state.scale, y: state.y, zIndex: 1, force3D: true });
       if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: true });
     });
-
-    var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 80;
-    var textMaxWidth = Math.max(120, Math.min(257, availableTextSpace));
-    var leftX = -(textMaxWidth + 32);
-    var rightX = textMaxWidth + 32;
-
-    items.forEach(function (item) {
-      var txt = item.querySelector('.product-parallax__item-txt');
-      if (!txt) return;
-      
-      if (!isMobile) {
-        txt.style.maxWidth = textMaxWidth + 'px';
-        gsap.set(txt, { x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX, y: 30, autoAlpha: 0 });
-      } else {
-        txt.style.maxWidth = '90%';
-        gsap.set(txt, { x: 0, y: 30, autoAlpha: 0 });
-      }
-    });
-    
-    gsap.set(items[0].querySelector('.product-parallax__item-txt'), { autoAlpha: 1, y: 0 });
 
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
