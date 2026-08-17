@@ -20,6 +20,17 @@
     scaleEnd: 1.0,               // Card end scale e.g. 1.0
     scaleFinishAt: 1.0,          // Scale finish progress ratio e.g. 0.5 to 1.0
 
+    // Mobile Stack Animation (Tablet & Mobile)
+    mobileAnim: {
+      enabled: true,             // Enable mobile/tablet slide-in animation
+      startOffset: 'top 85%',    // Offset 15% (trigger when top of wrapper hits 85% down viewport)
+      yOffset: 50,               // Slide in from bottom distance (px)
+      duration: 0.8,             // Animation duration in seconds
+      ease: 'power3.out',        // Ease function (ease-out)
+      delayStart: 0.3,           // 300ms delay for the 1st item
+      delayStep: 0.2             // 100ms increment for each subsequent item
+    },
+
     // Pseudo-image (.cohesive-k12__pseudo-img) start offset, scale & opacity options
     pseudoImage: {
       enabled: true,             // Enable pseudo-image animation (true/false)
@@ -155,7 +166,28 @@
 
     if (window.innerWidth < CONFIG.mobileBreakpoint) {
       wrapper.style.minHeight = '';
-      window.cohesiveAnimState = null;
+      if (CONFIG.mobileAnim && CONFIG.mobileAnim.enabled) {
+        var mobileTl = gsap.fromTo(items,
+          { opacity: 0, y: CONFIG.mobileAnim.yOffset },
+          {
+            opacity: 1,
+            y: 0,
+            duration: CONFIG.mobileAnim.duration,
+            ease: CONFIG.mobileAnim.ease,
+            stagger: function(index) {
+              return CONFIG.mobileAnim.delayStart + (index * CONFIG.mobileAnim.delayStep);
+            },
+            scrollTrigger: {
+              trigger: section,
+              start: CONFIG.mobileAnim.startOffset,
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+        window.cohesiveAnimState = { tl: mobileTl };
+      } else {
+        window.cohesiveAnimState = null;
+      }
       return;
     }
 

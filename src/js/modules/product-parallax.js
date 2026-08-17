@@ -148,12 +148,12 @@
         trigger: section,
         start: 'center center',
         end: '+=' + (window.innerHeight * CONFIG.scrollDistanceVh),
-        pin: section.closest('.products') || section,
+        pin: section.closest('.products-section') || section,
         scrub: CONFIG.pinScrub,
         invalidateOnRefresh: true,
         onRefresh: function(self) {
           if (self.spacer) {
-            var pinnedEl = section.closest('.products') || section;
+            var pinnedEl = section.closest('.products-section') || section;
             var bgColor = window.getComputedStyle(pinnedEl).backgroundColor;
             if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
               self.spacer.style.backgroundColor = bgColor;
