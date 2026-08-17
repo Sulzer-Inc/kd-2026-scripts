@@ -11,7 +11,7 @@
     stepDuration: 1.5,
     txtOffset: 0.1,
     pinScrub: 0.25,
-    mobileBreakpoint: 820,
+    mobileBreakpoint: 991,
   };
 
   var players = [];
@@ -106,8 +106,14 @@
 
     var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 80;
     var textMaxWidth = Math.max(120, Math.min(257, availableTextSpace));
-    var leftX = -(textMaxWidth + 32);
-    var rightX = textMaxWidth + 32;
+    
+    var spaceOnSide = (window.innerWidth - items[0].offsetWidth) / 2;
+    var idealOffset = textMaxWidth + 32;
+    var maxOffset = Math.max(0, spaceOnSide - 16); // 16px padding from screen edge
+    var actualOffset = Math.min(idealOffset, maxOffset);
+    
+    var leftX = -actualOffset;
+    var rightX = actualOffset;
 
     items.forEach(function (item) {
       var txt = item.querySelector('.product-parallax__item-txt');
@@ -118,8 +124,8 @@
         txt.style.maxWidth = textMaxWidth + 'px';
         gsap.set(txt, { position: 'absolute', top: '50%', yPercent: -50, x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX });
       } else {
-        txt.style.maxWidth = '90%';
-        gsap.set(txt, { position: 'relative', top: 'auto', yPercent: 0, x: 0 });
+        txt.style.maxWidth = ''; // clear any desktop inline width
+        gsap.set(txt, { clearProps: 'maxWidth,position,top,yPercent,x' });
       }
     });
 
@@ -142,8 +148,8 @@
       var img = item.querySelector('.product-parallax__item-content');
       var txt = item.querySelector('.product-parallax__item-txt');
 
-      if (img) gsap.set(img, { scale: state.scale, y: state.y, zIndex: 1, force3D: true });
-      if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: true });
+      if (img) gsap.set(img, { scale: state.scale, y: state.y, zIndex: 1, force3D: false });
+      if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: false });
     });
 
     var tl = gsap.timeline({
