@@ -158,7 +158,7 @@
     var tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: 'top top',
+        start: 'top 65px', // Adjusted so it pins below the fixed header
         end: '+=' + (window.innerHeight * totalTimelineDuration), // dynamically scaled pin scroll distance!
         pin: true,
         scrub: 1,
