@@ -11,7 +11,7 @@
     stepDuration: 1.5,
     txtOffset: 0.1,
     pinScrub: 0.25,
-    mobileBreakpoint: 1024,
+    mobileBreakpoint: 820,
   };
 
   var players = [];
@@ -102,10 +102,24 @@
     var isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
     if (items.length < 2) return;
 
+    // Normalize text heights so all cards have their video perfectly aligned vertically
+    var maxTxtHeight = 0;
+    items.forEach(function (item) {
+      var txt = item.querySelector('.product-parallax__item-txt');
+      if (txt) {
+        txt.style.minHeight = '0px';
+        if (txt.offsetHeight > maxTxtHeight) maxTxtHeight = txt.offsetHeight;
+      }
+    });
+    items.forEach(function (item) {
+      var txt = item.querySelector('.product-parallax__item-txt');
+      if (txt) txt.style.minHeight = maxTxtHeight + 'px';
+    });
+
     var cardHeight = items[0].offsetHeight;
     gsap.set(section, { position: 'relative', height: cardHeight + 'px', width: '100%' });
 
-    var itemMaxWidth = isMobile ? '90%' : (window.innerWidth < 1100 ? '50%' : '70%');
+    var itemMaxWidth = isMobile ? '100%' : (window.innerWidth < 1100 ? '50%' : '70%');
 
     items.forEach(function (item, i) {
       gsap.set(item, {
@@ -135,7 +149,7 @@
         txt.style.maxWidth = textMaxWidth + 'px';
         gsap.set(txt, { x: txt.classList.contains('product-parallax__item-txt--right') ? rightX : leftX, y: 30, autoAlpha: 0 });
       } else {
-        txt.style.maxWidth = '100%';
+        txt.style.maxWidth = '90%';
         gsap.set(txt, { x: 0, y: 30, autoAlpha: 0 });
       }
     });
