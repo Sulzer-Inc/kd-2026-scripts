@@ -300,10 +300,21 @@
     var section = document.querySelector('.cohesive-k-12, .cohesive-k12');
     if (!section) return;
 
+    // Run immediately so ScrollTrigger pin spacing is established BEFORE scroll restoration
+    initCohesiveAnimation();
+
     var imgs = section.querySelectorAll('img');
     var pending = [];
     for (var i = 0; i < imgs.length; i++) {
       if (!imgs[i].complete) pending.push(imgs[i]);
+    }
+
+    if (pending.length === 0) {
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+      }
+      return;
     }
 
     var hasRun = false;
@@ -313,17 +324,14 @@
       if (hasRun) return;
       hasRun = true;
       if (timerId) clearTimeout(timerId);
-      initCohesiveAnimation();
+      
+      // We only refresh the ScrollTriggers to account for loaded image dimensions,
+      // avoiding a full re-init which would kill the pin and clamp scroll position.
       if (typeof ScrollTrigger !== 'undefined') {
         ScrollTrigger.sort();
         ScrollTrigger.refresh();
       }
     };
-
-    if (pending.length === 0) {
-      run();
-      return;
-    }
 
     var remaining = pending.length;
     var done = function () {
@@ -346,7 +354,13 @@
   var resizeTimer;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(startWhenReady, 250);
+    resizeTimer = setTimeout(function () {
+      initCohesiveAnimation();
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+      }
+    }, 250);
   });
 
   if (window.Webflow) {
