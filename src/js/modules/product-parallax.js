@@ -84,10 +84,31 @@
     var section = document.querySelector('.product-parallax');
     if (!section) return;
 
+    var pinnedEl = section.closest('.products-section') || section;
+
+    // Ensure smooth background and text transition for dark-blue theme change and full-viewport height
+    if (!document.getElementById('kd-product-parallax-transitions')) {
+      var styleTag = document.createElement('style');
+      styleTag.id = 'kd-product-parallax-transitions';
+      styleTag.textContent = [
+        '.products-section { min-height: 100vh !important; display: flex !important; flex-direction: column !important; justify-content: center !important; transition: background-color 0.6s ease, color 0.6s ease !important; width: 100% !important; box-sizing: border-box !important; }',
+        '.products-section .products-section__container { width: 100% !important; }',
+        '.products-section .product-parallax__item-txt,',
+        '.products-section .product-parallax__heading,',
+        '.products-section .copy-2026,',
+        '.products-section h1, .products-section h2, .products-section h3,',
+        '.products-section p, .products-section div { transition: color 0.6s ease; }'
+      ].join(' ');
+      document.head.appendChild(styleTag);
+    }
+
     if (window.productCardsTl) {
       if (window.productCardsTl.scrollTrigger) window.productCardsTl.scrollTrigger.kill(true);
       window.productCardsTl.kill();
+      var oldThemeTrigger = ScrollTrigger.getById('kd-product-parallax-theme');
+      if (oldThemeTrigger) oldThemeTrigger.kill(true);
       gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__item-txt'], { clearProps: 'all' });
+      if (pinnedEl) pinnedEl.classList.remove('dark-blue');
       
       // Pause all existing players and reset the list
       players.forEach(function (player) {
@@ -162,15 +183,15 @@
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
+        id: 'kd-product-parallax-pin',
         trigger: section,
         start: 'center center',
         end: '+=' + (window.innerHeight * CONFIG.scrollDistanceVh),
-        pin: section.closest('.products-section') || section,
+        pin: pinnedEl,
         scrub: CONFIG.pinScrub,
         invalidateOnRefresh: true,
         onRefresh: function(self) {
           if (self.spacer) {
-            var pinnedEl = section.closest('.products-section') || section;
             var bgColor = window.getComputedStyle(pinnedEl).backgroundColor;
             if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
               self.spacer.style.backgroundColor = bgColor;
@@ -196,6 +217,23 @@
     });
 
     window.productCardsTl = tl;
+
+    // Early Theme Trigger: only toggles dark-blue when .product-parallax has .dark-bg
+    var hasDarkBg = section.classList.contains('dark-bg') || (pinnedEl && pinnedEl.classList.contains('dark-bg'));
+    if (hasDarkBg) {
+      ScrollTrigger.create({
+        id: 'kd-product-parallax-theme',
+        trigger: pinnedEl,
+        start: 'top 75%',
+        end: function() {
+          return tl.scrollTrigger ? tl.scrollTrigger.end : '+=' + (window.innerHeight * (CONFIG.scrollDistanceVh + 1));
+        },
+        toggleClass: {
+          targets: pinnedEl,
+          className: 'dark-blue'
+        }
+      });
+    }
 
     items.forEach(function (item, i) {
       if (i === 0) return;

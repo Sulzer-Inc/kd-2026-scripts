@@ -1,0 +1,26 @@
+// =============================================================================
+// Product Parallax Section Styles & Theme Transitions
+// =============================================================================
+
+.products-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.6s ease, color 0.6s ease;
+
+  .products-section__container {
+    width: 100%;
+  }
+
+  .product-parallax__item-txt,
+  .product-parallax__heading,
+  .copy-2026,
+  h1, h2, h3, p, div {
+    transition: color 0.6s ease;
+  }
+}
+
