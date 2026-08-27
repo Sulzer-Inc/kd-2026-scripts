@@ -253,19 +253,22 @@
 
       if (prevTxt) {
         tl.to(prevTxt, { y: window.innerWidth >= 1280 ? '-60%' : -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
-        tl.to(prevTxt, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i);
+        tl.to(prevTxt, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i + '+=' + (CONFIG.stepDuration * 0.35));
       }
       if (prevImg) {
         tl.to(prevImg, { y: -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
         if (hasDarkBg) {
-          tl.to(prevImg, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i);
+          // Delay previous card fade out until the incoming card is already fully opaque
+          tl.to(prevImg, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.45 }, 'step-' + i + '+=' + (CONFIG.stepDuration * 0.35));
         }
       }
       
       if (currImg) {
         var currTo = { scale: 1, y: 0, duration: CONFIG.stepDuration };
         if (hasDarkBg) {
-          tl.fromTo(currImg, { scale: currStart.scale, y: currStart.y, autoAlpha: 0 }, { scale: 1, y: 0, autoAlpha: 1, duration: CONFIG.stepDuration }, 'step-' + i);
+          // Fast initial fade in for the incoming card so it reaches opacity 1 before the previous card starts fading out
+          tl.fromTo(currImg, { scale: currStart.scale, y: currStart.y }, { scale: 1, y: 0, duration: CONFIG.stepDuration }, 'step-' + i);
+          tl.fromTo(currImg, { autoAlpha: 0 }, { autoAlpha: 1, duration: CONFIG.stepDuration * 0.3 }, 'step-' + i);
         } else {
           tl.fromTo(currImg, { scale: currStart.scale, y: currStart.y }, currTo, 'step-' + i);
         }
