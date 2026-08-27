@@ -165,6 +165,8 @@
     var cardHeight = maxItemHeight;
     gsap.set(section, { position: 'relative', height: cardHeight + 'px', width: '100%' });
 
+    var hasDarkBg = section.classList.contains('dark-bg') || (pinnedEl && pinnedEl.classList.contains('dark-bg'));
+
     items.forEach(function (item, i) {
       gsap.set(item, {
         position: 'absolute', bottom: '0', top: 'auto', left: '50%',
@@ -176,7 +178,13 @@
       var img = item.querySelector('.product-parallax__item-content');
       var txt = item.querySelector('.product-parallax__item-txt');
 
-      if (img) gsap.set(img, { scale: state.scale, y: state.y, zIndex: 1, force3D: false });
+      if (img) {
+        var imgProps = { scale: state.scale, y: state.y, zIndex: 1, force3D: false };
+        if (hasDarkBg) {
+          imgProps.autoAlpha = i === 0 ? 1 : 0;
+        }
+        gsap.set(img, imgProps);
+      }
       if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: false });
     });
 
@@ -219,7 +227,6 @@
     window.productCardsTl = tl;
 
     // Early Theme Trigger: only toggles dark-blue when .product-parallax has .dark-bg
-    var hasDarkBg = section.classList.contains('dark-bg') || (pinnedEl && pinnedEl.classList.contains('dark-bg'));
     if (hasDarkBg) {
       ScrollTrigger.create({
         id: 'kd-product-parallax-theme',
@@ -248,9 +255,21 @@
         tl.to(prevTxt, { y: window.innerWidth >= 1280 ? '-60%' : -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
         tl.to(prevTxt, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i);
       }
-      if (prevImg) tl.to(prevImg, { y: -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
+      if (prevImg) {
+        tl.to(prevImg, { y: -window.innerHeight, duration: CONFIG.stepDuration }, 'step-' + i);
+        if (hasDarkBg) {
+          tl.to(prevImg, { autoAlpha: 0, duration: CONFIG.stepDuration * 0.4 }, 'step-' + i);
+        }
+      }
       
-      if (currImg) tl.fromTo(currImg, { scale: currStart.scale, y: currStart.y }, { scale: 1, y: 0, duration: CONFIG.stepDuration }, 'step-' + i);
+      if (currImg) {
+        var currTo = { scale: 1, y: 0, duration: CONFIG.stepDuration };
+        if (hasDarkBg) {
+          tl.fromTo(currImg, { scale: currStart.scale, y: currStart.y, autoAlpha: 0 }, { scale: 1, y: 0, autoAlpha: 1, duration: CONFIG.stepDuration }, 'step-' + i);
+        } else {
+          tl.fromTo(currImg, { scale: currStart.scale, y: currStart.y }, currTo, 'step-' + i);
+        }
+      }
       
       if (currTxt) {
         tl.fromTo(currTxt, { y: 30 }, { y: 0, duration: CONFIG.stepDuration }, 'step-' + i + '+=' + CONFIG.txtOffset);
