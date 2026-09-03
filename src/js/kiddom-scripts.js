@@ -6,6 +6,7 @@
 // Global
 require('./modules/vimeo-global.js');
 require('./modules/splide-logo-carousel.js');
+require('./modules/vid-autoplay-hover.js');
 
 // Used in Homepage
 require('./modules/svg-path-animator.js');
