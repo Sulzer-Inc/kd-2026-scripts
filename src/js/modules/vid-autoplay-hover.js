@@ -7,11 +7,20 @@
   'use strict';
 
   function isTouchOrSmallScreen() {
-    return (
-      window.matchMedia('(max-width: 991px)').matches ||
-      window.matchMedia('(hover: none)').matches ||
-      window.matchMedia('(pointer: coarse)').matches
-    );
+    // 1. Screen width check (Tablet and Mobile in Webflow are <= 991px)
+    if (window.innerWidth <= 991) return true;
+    if (window.matchMedia && window.matchMedia('(max-width: 991px)').matches) return true;
+
+    // 2. If screen width > 991px (Desktop):
+    // Desktop devices (Mac Safari, Chrome, Windows) with mouse or trackpad support hover & pointer: fine
+    var hasHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+    var hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
+    if (hasHover || hasFinePointer) {
+      return false; // Confirmed desktop with mouse/trackpad: require hover
+    }
+
+    return true;
   }
 
   function ensureVimeoSDK(callback) {
@@ -185,6 +194,14 @@
 
       container.dataset.vidAutoplayInitialized = 'true';
       container._mediaController = controller;
+
+      // Ensure video is paused on desktop initially and remove HTML autoplay attribute
+      if (controller.element && controller.element.hasAttribute && controller.element.hasAttribute('autoplay')) {
+        controller.element.removeAttribute('autoplay');
+      }
+      if (!isTouchOrSmallScreen()) {
+        controller.pause();
+      }
 
       // Desktop: Play on hover, pause on leave
       container.addEventListener('mouseenter', function () {
