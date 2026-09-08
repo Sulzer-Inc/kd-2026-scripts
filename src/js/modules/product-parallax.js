@@ -118,7 +118,7 @@
     var isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
     if (items.length < 2) return;
 
-    var itemMaxWidth = isMobile ? '100%' : (window.innerWidth < 1440 ? '65%' : '70%');
+    var itemMaxWidth = isMobile ? '90%' : (window.innerWidth < 1440 ? '65%' : '70%');
 
     var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 80;
     var textMaxWidth = Math.max(120, Math.min(257, availableTextSpace));
