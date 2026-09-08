@@ -17,3 +17,56 @@
   }
 }
 
+@media (max-width: 991px) and (max-height: 550px) {
+  .products-section {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 3rem 0;
+    justify-content: flex-start !important;
+  }
+
+  .product-parallax {
+    position: relative !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2.5rem !important;
+  }
+
+  .product-parallax__item {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: auto !important;
+  }
+
+  .product-parallax__item-txt {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-width: 100% !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+  }
+
+  .product-parallax__item-content {
+    position: relative !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 100% !important;
+  }
+}
+

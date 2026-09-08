@@ -18,6 +18,10 @@
   var activeCardIndex = 0;
   var isSectionInView = false;
 
+  function isLandscapeMobile() {
+    return window.innerWidth <= CONFIG.mobileBreakpoint && window.innerHeight <= 550;
+  }
+
   function behindState(i) {
     return {
       scale: Math.max(1 - i * CONFIG.behindScaleStep, 0.7),
@@ -100,24 +104,47 @@
     if (window.productCardsTl) {
       if (window.productCardsTl.scrollTrigger) window.productCardsTl.scrollTrigger.kill(true);
       window.productCardsTl.kill();
-      var oldThemeTrigger = ScrollTrigger.getById('kd-product-parallax-theme');
-      if (oldThemeTrigger) oldThemeTrigger.kill(true);
-      gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__item-txt'], { clearProps: 'all' });
-      if (pinnedEl) pinnedEl.classList.remove('dark-blue');
-      
-      // Pause all existing players and reset the list
-      players.forEach(function (player) {
-        if (player) {
-          try { player.pause(); } catch (e) {}
-        }
-      });
-      players = [];
+      window.productCardsTl = null;
     }
+    var oldThemeTrigger = ScrollTrigger.getById('kd-product-parallax-theme');
+    if (oldThemeTrigger) oldThemeTrigger.kill(true);
+    var oldPinTrigger = ScrollTrigger.getById('kd-product-parallax-pin');
+    if (oldPinTrigger) oldPinTrigger.kill(true);
+    gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__item-txt'], { clearProps: 'all' });
+    if (pinnedEl) pinnedEl.classList.remove('dark-blue');
+    
+    // Pause all existing players and reset the list
+    players.forEach(function (player) {
+      if (player) {
+        try { player.pause(); } catch (e) {}
+      }
+    });
+    players = [];
 
     var items = gsap.utils.toArray('.product-parallax__item');
-    var isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
     if (items.length < 2) return;
 
+    var hasDarkBg = section.classList.contains('dark-bg') || (pinnedEl && pinnedEl.classList.contains('dark-bg'));
+
+    if (isLandscapeMobile()) {
+      gsap.set([section, '.product-parallax__item', '.product-parallax__item-content', '.product-parallax__item-txt'], { clearProps: 'all' });
+      if (hasDarkBg) {
+        ScrollTrigger.create({
+          id: 'kd-product-parallax-theme',
+          trigger: pinnedEl,
+          start: 'top 75%',
+          end: 'bottom 25%',
+          toggleClass: { targets: pinnedEl, className: 'dark-blue' },
+          invalidateOnRefresh: true,
+        });
+      }
+      initVimeoPlayersForCards(items);
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
+      return;
+    }
+
+    var isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
     var itemMaxWidth = isMobile ? '90%' : (window.innerWidth < 1440 ? '65%' : '70%');
 
     var availableTextSpace = (window.innerWidth - items[0].offsetWidth) / 2 - 80;
@@ -159,8 +186,6 @@
 
     var cardHeight = maxItemHeight;
     gsap.set(section, { position: 'relative', height: cardHeight + 'px', width: '100%' });
-
-    var hasDarkBg = section.classList.contains('dark-bg') || (pinnedEl && pinnedEl.classList.contains('dark-bg'));
 
     items.forEach(function (item, i) {
       gsap.set(item, {
@@ -313,6 +338,8 @@
       hasRun = true;
       if (timerId) clearTimeout(timerId);
       
+      if (isLandscapeMobile()) return;
+
       // Recalculate section height in case images expanded the cards
       var pSection = document.querySelector('.product-parallax');
       if (pSection && typeof gsap !== 'undefined') {
@@ -354,10 +381,12 @@
   }
 
   var lastWidth = window.innerWidth;
+  var lastHeight = window.innerHeight;
   var resizeTimeout;
   window.addEventListener('resize', function () {
-    if (window.innerWidth === lastWidth) return;
+    if (window.innerWidth === lastWidth && window.innerHeight === lastHeight) return;
     lastWidth = window.innerWidth;
+    lastHeight = window.innerHeight;
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(function() {
       init();
