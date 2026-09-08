@@ -162,6 +162,8 @@
         end: '+=' + (window.innerHeight * totalTimelineDuration), // dynamically scaled pin scroll distance!
         pin: true,
         scrub: 1,
+        anticipatePin: 1,
+        fastScrollEnd: true,
         invalidateOnRefresh: true
       }
     });
@@ -248,8 +250,11 @@
   if (document.readyState === 'complete' || document.readyState === 'interactive') init();
   else window.addEventListener('load', init);
 
+  var lastWidth = window.innerWidth;
   var resizeTimeout;
   window.addEventListener('resize', function () {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(init, 250);
   });

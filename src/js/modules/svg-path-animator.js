@@ -130,9 +130,11 @@
         });
       }
 
-      // 4. Continuous Rotating Gradient (Never stops, spins 360 degrees smoothly around shape center)
+      // 4. Continuous Rotating Gradient (Spins smoothly around shape center when in viewport)
       var linearGradients = Array.prototype.slice.call(container.querySelectorAll('linearGradient'));
       if (linearGradients.length > 0 && (gradients.length > 0 || container.querySelector('[style*="url"], [fill*="url"]'))) {
+        var gradientTweens = [];
+
         linearGradients.forEach(function (grad, idx) {
           if (grad.dataset.gradientRotationInitialized === 'true') return;
           grad.dataset.gradientRotationInitialized = 'true';
@@ -157,7 +159,7 @@
           var duration = 9 + (idx * 2); // smooth, elegant continuous rotation speed
           var dir = (idx % 2 === 0) ? 1 : -1; // alternating clockwise & counter-clockwise
 
-          _gsap.to(rotObj, {
+          var rotTween = _gsap.to(rotObj, {
             angle: 360 * dir,
             duration: duration,
             repeat: -1,
@@ -166,7 +168,26 @@
               grad.setAttribute('gradientTransform', 'rotate(' + rotObj.angle + ', ' + cx + ', ' + cy + ') ' + origMatrix);
             }
           });
+
+          gradientTweens.push(rotTween);
         });
+
+        // Optimize RAF loop: pause gradient rotation when offscreen, resume when visible
+        if (gradientTweens.length > 0 && typeof IntersectionObserver !== 'undefined') {
+          var gradObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              gradientTweens.forEach(function (tween) {
+                if (entry.isIntersecting) {
+                  tween.play();
+                } else {
+                  tween.pause();
+                }
+              });
+            });
+          }, { rootMargin: '50px' });
+
+          gradObserver.observe(container);
+        }
       }
 
       // 5. Read config from data attributes or fallback to defaults

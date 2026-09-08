@@ -463,8 +463,11 @@
     document.addEventListener('DOMContentLoaded', startWhenReady);
   }
 
+  var lastWidth = window.innerWidth;
   var resizeTimer;
   window.addEventListener('resize', function () {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(startWhenReady, 250);
   });

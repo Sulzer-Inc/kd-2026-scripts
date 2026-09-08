@@ -6,3 +6,17 @@
 // Vendor Styles
 @use 'modules/splide';
 @use 'modules/product-parallax';
+
+// Hardware Acceleration & GPU Composite Layer Optimization
+.product-parallax__item,
+.product-parallax__item-content,
+.product-parallax__item-txt,
+.cohesive-k12__item,
+.us-map__scroll-item,
+.rotator-video__item {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}

@@ -2,6 +2,17 @@
 // JS Entry Point - Main Manifest
 // Bundles to: js/kiddom-scripts-bundled.js
 // =============================================================================
+// ScrollTrigger Global Mobile Scroll Smoothing Configuration
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({
+    ignoreMobileResize: true,
+    autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load'
+  });
+  if (ScrollTrigger.isTouch === 1) {
+    ScrollTrigger.normalizeScroll({ allowNestedScroll: true });
+  }
+}
 
 // Global
 require('./modules/vimeo-global.js');

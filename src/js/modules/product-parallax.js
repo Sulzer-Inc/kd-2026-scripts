@@ -179,13 +179,13 @@
       var txt = item.querySelector('.product-parallax__item-txt');
 
       if (img) {
-        var imgProps = { scale: state.scale, y: state.y, zIndex: 1, force3D: false };
+        var imgProps = { scale: state.scale, y: state.y, zIndex: 1, force3D: true };
         if (hasDarkBg) {
           imgProps.autoAlpha = i === 0 ? 1 : 0;
         }
         gsap.set(img, imgProps);
       }
-      if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: false });
+      if (txt) gsap.set(txt, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 30, zIndex: 2, force3D: true });
     });
 
     var tl = gsap.timeline({
@@ -197,6 +197,8 @@
         end: '+=' + (window.innerHeight * CONFIG.scrollDistanceVh),
         pin: pinnedEl,
         scrub: CONFIG.pinScrub,
+        anticipatePin: 1,
+        fastScrollEnd: true,
         invalidateOnRefresh: true,
         onRefresh: function(self) {
           if (self.spacer) {
@@ -356,8 +358,11 @@
     window.addEventListener('load', startWhenReady);
   }
 
+  var lastWidth = window.innerWidth;
   var resizeTimeout;
   window.addEventListener('resize', function () {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(function() {
       init();

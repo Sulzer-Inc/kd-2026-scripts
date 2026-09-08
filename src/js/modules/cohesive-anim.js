@@ -285,6 +285,8 @@
           scrub: true,
           pin: true,
           pinSpacing: true,
+          anticipatePin: 1,
+          fastScrollEnd: true,
           invalidateOnRefresh: true,
           onUpdate: renderOrbit
         }
@@ -351,8 +353,11 @@
     document.addEventListener('DOMContentLoaded', startWhenReady);
   }
 
+  var lastWidth = window.innerWidth;
   var resizeTimer;
   window.addEventListener('resize', function () {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
       initCohesiveAnimation();
