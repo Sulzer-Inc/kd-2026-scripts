@@ -7,23 +7,48 @@
 // =============================================================================
 // Splide Columns Slider Custom Styling
 // =============================================================================
+.splide,
+.splide__track,
+.splide__list,
+.splide__slide {
+  touch-action: pan-y !important;
+}
+
+.splide__slide,
+.splide__slide--clone,
+.splide-cols-slider__item,
+.real-impact__slider-item {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .splide-cols-slider,
 .splide-impact-slider,
-.splide--cols {
+.splide--cols,
+.real-impact__slider {
   position: relative;
   width: 100%;
   gap: 0!important;
+  touch-action: pan-y !important;
+  -webkit-user-drag: none;
+  user-select: none;
 
   .splide__track {
     overflow: hidden;
     padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    padding-bottom: 3.75rem;
     margin-top: -1.5rem;
     margin-bottom: -1.5rem;
+    touch-action: pan-y !important;
+    -webkit-user-drag: none;
+    user-select: none;
   }
 
   .splide__list {
     display: flex;
+    touch-action: pan-y !important;
+    -webkit-user-drag: none;
+    user-select: none;
   }
 
   .splide__slide {
@@ -31,6 +56,16 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    touch-action: pan-y !important;
+    -webkit-user-drag: none;
+    user-select: none;
+
+    &[href],
+    a {
+      -webkit-touch-callout: none;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
   }
 
   // Navigation Arrows Styling
@@ -130,13 +165,35 @@
   }
 }
 
+.splide__pagination,
 ul.splide__pagination {
-  button.splide__pagination__page {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  button.splide__pagination__page,
+  .splide__pagination__page {
+    pointer-events: auto;
+    touch-action: manipulation;
+    cursor: pointer;
     margin-inline: .35rem;
     background-color: transparent;
     border: .5px solid #3F4C4C;
+    border-radius: 50%;
     width: .75rem;
     height: .75rem;
+    padding: 0;
     
     &.is-active {
       background: #3F4C4C;
@@ -145,17 +202,14 @@ ul.splide__pagination {
   }
 }
 
-.splide-logo-carousel {
+.splide-logo-carousel,
+.splide-cols-slider,
+.splide-impact-slider,
+.splide--cols,
+.real-impact__slider {
   .splide__track {
     padding-bottom: 3.75rem;
-
   }
 }
 
-.splide-cols-slider {
-  .splide__track {
-    padding-bottom: 3.75rem;
-
-  }
-}
 

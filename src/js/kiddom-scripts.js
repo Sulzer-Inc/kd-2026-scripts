@@ -9,9 +9,6 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     ignoreMobileResize: true,
     autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load'
   });
-  if (ScrollTrigger.isTouch === 1) {
-    ScrollTrigger.normalizeScroll({ allowNestedScroll: true });
-  }
 }
 
 // Global
