@@ -86,18 +86,13 @@
 
     var pinnedEl = section.closest('.products-section') || section;
 
-    // Ensure smooth background and text transition for dark-blue theme change and full-viewport height
+    // Ensure smooth background transition for dark-blue theme change and full-viewport height
     if (!document.getElementById('kd-product-parallax-transitions')) {
       var styleTag = document.createElement('style');
       styleTag.id = 'kd-product-parallax-transitions';
       styleTag.textContent = [
-        '.products-section { display: flex !important; flex-direction: column !important; justify-content: center !important; transition: background-color 0.6s ease, color 0.6s ease !important; width: 100% !important; box-sizing: border-box !important; }',
-        '.products-section .products-section__container { width: 100% !important; }',
-        '.products-section .product-parallax__item-txt,',
-        '.products-section .product-parallax__heading,',
-        '.products-section .copy-2026,',
-        '.products-section h1, .products-section h2, .products-section h3,',
-        '.products-section p, .products-section div { transition: color 0.6s ease; }'
+        '.products-section { display: flex !important; flex-direction: column !important; justify-content: center !important; transition: background-color 0.6s ease !important; width: 100% !important; box-sizing: border-box !important; }',
+        '.products-section .products-section__container { width: 100% !important; }'
       ].join(' ');
       document.head.appendChild(styleTag);
     }
