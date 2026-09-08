@@ -17,6 +17,12 @@
   }
 }
 
+.product-parallax__item,
+.product-parallax__item-content,
+.product-parallax__item-txt {
+  transition: none !important;
+}
+
 @media (max-width: 991px) and (max-height: 550px) {
   .products-section {
     min-height: auto !important;

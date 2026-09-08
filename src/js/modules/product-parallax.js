@@ -148,38 +148,23 @@
 
       window.productCardsMobileTls = [];
       items.forEach(function (item, idx) {
-        var inTween = gsap.fromTo(item,
-          { autoAlpha: 0, y: 30 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            ease: 'power1.out',
-            scrollTrigger: {
-              id: 'kd-card-in-' + idx,
-              trigger: item,
-              start: 'top 85%',
-              end: 'top 45%',
-              scrub: 0.5,
-              invalidateOnRefresh: true,
-            }
-          }
-        );
-
-        var outTween = gsap.to(item, {
-          autoAlpha: 0,
-          y: -20,
-          ease: 'power1.in',
+        var itemTl = gsap.timeline({
           scrollTrigger: {
-            id: 'kd-card-out-' + idx,
+            id: 'kd-card-scroll-' + idx,
             trigger: item,
-            start: 'top 20%',
-            end: 'top -10%',
+            start: 'top 90%',
+            end: 'bottom 10%',
             scrub: 0.5,
             invalidateOnRefresh: true,
           }
         });
 
-        window.productCardsMobileTls.push(inTween, outTween);
+        itemTl
+          .fromTo(item, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, ease: 'power1.out', duration: 0.3 })
+          .to(item, { autoAlpha: 1, y: 0, duration: 0.4 })
+          .to(item, { autoAlpha: 0, y: -30, ease: 'power1.in', duration: 0.3 });
+
+        window.productCardsMobileTls.push(itemTl);
       });
 
       initVimeoPlayersForCards(items);
