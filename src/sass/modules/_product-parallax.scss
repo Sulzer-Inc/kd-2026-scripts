@@ -21,7 +21,7 @@
   .products-section {
     min-height: auto !important;
     height: auto !important;
-    padding: 3rem 0;
+    padding: 2rem 0 !important;
     justify-content: flex-start !important;
   }
 
@@ -30,7 +30,7 @@
     height: auto !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 2.5rem !important;
+    gap: 2rem !important;
   }
 
   .product-parallax__item {
@@ -57,7 +57,7 @@
     opacity: 1 !important;
     visibility: visible !important;
     max-width: 100% !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.5rem !important;
     text-align: center !important;
   }
 
@@ -67,6 +67,9 @@
     opacity: 1 !important;
     visibility: visible !important;
     width: 100% !important;
+    max-width: min(440px, 65vw) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
 
