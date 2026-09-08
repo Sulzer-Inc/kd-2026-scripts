@@ -106,6 +106,13 @@
       window.productCardsTl.kill();
       window.productCardsTl = null;
     }
+    if (window.productCardsMobileTls && window.productCardsMobileTls.length) {
+      window.productCardsMobileTls.forEach(function (t) {
+        if (t.scrollTrigger) t.scrollTrigger.kill(true);
+        t.kill();
+      });
+      window.productCardsMobileTls = [];
+    }
     var oldThemeTrigger = ScrollTrigger.getById('kd-product-parallax-theme');
     if (oldThemeTrigger) oldThemeTrigger.kill(true);
     var oldPinTrigger = ScrollTrigger.getById('kd-product-parallax-pin');
@@ -138,6 +145,43 @@
           invalidateOnRefresh: true,
         });
       }
+
+      window.productCardsMobileTls = [];
+      items.forEach(function (item, idx) {
+        var inTween = gsap.fromTo(item,
+          { autoAlpha: 0, y: 30 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            ease: 'power1.out',
+            scrollTrigger: {
+              id: 'kd-card-in-' + idx,
+              trigger: item,
+              start: 'top 85%',
+              end: 'top 45%',
+              scrub: 0.5,
+              invalidateOnRefresh: true,
+            }
+          }
+        );
+
+        var outTween = gsap.to(item, {
+          autoAlpha: 0,
+          y: -20,
+          ease: 'power1.in',
+          scrollTrigger: {
+            id: 'kd-card-out-' + idx,
+            trigger: item,
+            start: 'top 20%',
+            end: 'top -10%',
+            scrub: 0.5,
+            invalidateOnRefresh: true,
+          }
+        });
+
+        window.productCardsMobileTls.push(inTween, outTween);
+      });
+
       initVimeoPlayersForCards(items);
       ScrollTrigger.sort();
       ScrollTrigger.refresh();
