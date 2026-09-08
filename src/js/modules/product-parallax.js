@@ -91,7 +91,7 @@
       var styleTag = document.createElement('style');
       styleTag.id = 'kd-product-parallax-transitions';
       styleTag.textContent = [
-        '.products-section { min-height: 100vh !important; display: flex !important; flex-direction: column !important; justify-content: center !important; transition: background-color 0.6s ease, color 0.6s ease !important; width: 100% !important; box-sizing: border-box !important; }',
+        '.products-section { display: flex !important; flex-direction: column !important; justify-content: center !important; transition: background-color 0.6s ease, color 0.6s ease !important; width: 100% !important; box-sizing: border-box !important; }',
         '.products-section .products-section__container { width: 100% !important; }',
         '.products-section .product-parallax__item-txt,',
         '.products-section .product-parallax__heading,',
