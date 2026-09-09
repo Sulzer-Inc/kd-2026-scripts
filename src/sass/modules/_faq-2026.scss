@@ -4,16 +4,18 @@
 
 .faq-2026__answer {
   height: 0;
-  overflow: hidden;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1), padding-bottom 0.35s ease;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
   width: 100% !important;
-  box-sizing: border-box;
-}
+  box-sizing: border-box !important;
 
-.faq-2026__wrapper.is-open .faq-2026__answer {
-  padding-bottom: 1.25rem !important;
+  .faq-2026__answer-inner {
+    padding: 0 2rem 1.25rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
 
 .faq-2026__wrapper .expand-icon-2,
