@@ -1,0 +1,35 @@
+﻿// =============================================================================
+// FAQ 2026 Component Styles
+// =============================================================================
+
+.faq-2026__answer {
+  display: grid !important;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.25, 1, 0.5, 1), padding-bottom 0.35s ease !important;
+  overflow: hidden !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  width: 100% !important;
+
+  > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.faq-2026__wrapper.is-open .faq-2026__answer {
+  grid-template-rows: 1fr;
+  padding-bottom: 1.25rem !important;
+}
+
+.faq-2026__wrapper .expand-icon-2,
+.faq-2026__wrapper .expand-icon {
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  transform-origin: center center !important;
+  display: block !important;
+}
+
+.faq-2026__wrapper.is-open .expand-icon-2,
+.faq-2026__wrapper.is-open .expand-icon {
+  transform: rotate(45deg) !important;
+}

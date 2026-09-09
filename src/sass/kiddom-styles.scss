@@ -3,9 +3,10 @@
 // Compiles to: dist/css/kiddom-styles.min.css
 // =============================================================================
 
-// Vendor Styles
+// Vendor & Component Styles
 @use 'modules/splide';
 @use 'modules/product-parallax';
+@use 'modules/faq-2026';
 
 // Hardware Acceleration & GPU Composite Layer Optimization
 .product-parallax__item,
