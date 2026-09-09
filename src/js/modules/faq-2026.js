@@ -12,6 +12,7 @@
 
       var question = wrapper.querySelector('.faq-2026__question');
       var answer = wrapper.querySelector('.faq-2026__answer');
+      if (!answer) return;
 
       if (question) {
         question.setAttribute('role', 'button');
@@ -19,18 +20,45 @@
         question.setAttribute('aria-expanded', 'false');
       }
 
+      function openItem() {
+        wrapper.classList.add('is-open');
+        if (question) question.setAttribute('aria-expanded', 'true');
+
+        // Measure content height and animate
+        answer.style.height = answer.scrollHeight + 'px';
+
+        function onEnd() {
+          if (wrapper.classList.contains('is-open')) {
+            answer.style.height = 'auto';
+          }
+          answer.removeEventListener('transitionend', onEnd);
+        }
+        answer.addEventListener('transitionend', onEnd);
+      }
+
+      function closeItem() {
+        // Set fixed height before animating down to 0
+        answer.style.height = answer.scrollHeight + 'px';
+        // Force reflow
+        void answer.offsetHeight;
+
+        wrapper.classList.remove('is-open');
+        if (question) question.setAttribute('aria-expanded', 'false');
+
+        answer.style.height = '0px';
+      }
+
       function toggleAccordion(e) {
-        // Allow keyboard navigation (Enter and Space)
         if (e.type === 'keydown') {
           if (e.key !== 'Enter' && e.key !== ' ') return;
           e.preventDefault();
         }
 
         var isOpen = wrapper.classList.contains('is-open');
-        wrapper.classList.toggle('is-open', !isOpen);
-
-        if (question) {
-          question.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+        if (isOpen) {
+          closeItem();
+        } else {
+          openItem();
         }
       }
 
